@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME="yolov5_v6.0"
+IMAGE_NAME="sara980710/yolov5_env"
 
 ROOT_DIR=$PWD
 DATA_DIR=/home/erik/local/data/seabirds/datasets/2019/yolov5
