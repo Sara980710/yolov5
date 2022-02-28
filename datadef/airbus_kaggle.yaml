@@ -1,0 +1,9 @@
+# number of classes
+nc: 1
+
+# class names
+names: [ 'boat']
+
+train: ../datasets/test.txt
+val: ../datasets/test.txt
+
