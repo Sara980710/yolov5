@@ -10,7 +10,7 @@
 This demo is using Linux, Ubuntu 20.04.
 
 ## Build own Docker image locally (and upload in Docker Hub)
-Write your Dockerfile in the "build/"-folder. If use the same image-name as the repository in your [Docker Hub](https://hub.docker.com/), in this example we use "sara980710/yolov5_env:v1.0" where the version of the image is v1.0. 
+Write your Dockerfile in preprocessing, train or predict folder. If use the same image-name as the repository in your [Docker Hub](https://hub.docker.com/) "user/repo:tag", ex. "sara980710/yolov5_train:v1.0". 
 ````bash
 cd build
 sh build.sh
@@ -22,14 +22,24 @@ Create a repository with the same name as your image (without version number), e
 
 Use the following command to upload the image:
 ````bash
-docker push sara980710/yolov5_env:v1.0
+docker push user/repo:tag
 ````
 
-## Train the model in docker image
-Start the image in you rengine using the uploaded image (don't forget the version number), ex. "sara980710/yolov5_env:v1.0" using following mounted folders:
+## Preprocessing in a docker image
+Start the image in you rengine using the uploaded image (don't forget the version number) and use following mounted folders:
+* Your dataset --> data/
+
+When you have started the image, go to the desired repo and clone this repo
+````bash
+git clone https://github.com/Sara980710/yolov5
+````
+Bla bla bla...
+
+## Train the model in a docker image
+Start the image in you rengine using the uploaded image (don't forget the version number) and use following mounted folders:
 * Your dataset --> data/
 * Folder where you save the results --> project/
-* 
+
 When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
