@@ -9,50 +9,43 @@
 ## Prerequisites
 This demo is using Linux, Ubuntu 20.04.
 
-## Train the model in docker image
-Go to the desired repo and clone this repo
-````bash
-git clone 
-````
-First time you would need to clone the source code, see below :triangular_flag_on_post:.
-
-Start the training with
-````bash
-python3 main.py
-````
-The results will be written to 'runs/expX'.
-
-Before launching the main.py script you might also like to adjust the parameters in [main.py](./main.py).
-
-### :triangular_flag_on_post: Clone the source code
-Clone the AI Sweden startup kit:
-````bash
-git clone https://github.com/aidotse/startupkit-DF.git
-cd startupkit-DF/aiqu/seabird
-````
-
-Clone the yolov5 code:
-````bash
-git clone https://github.com/ultralytics/yolov5.git
-````
-
-## Build the Docker image and push your image
-This step is not strictly necessary. A prebuilt model, 'eriksaidotse/yolov5_v6.0_env', is all ready available on Docker Hub, and also downloaded to the DGX.
-
-However a good exercise would be to build and upload your own model.
-
+## Build own Docker image locally (and upload in Docker Hub)
+Write your Dockerfile in the "build/"-folder. If use the same image-name as the repository in your [Docker Hub](https://hub.docker.com/), in this example we use "sara980710/yolov5_env:v1.0". 
 ````bash
 cd build
 sh build.sh
 ````
-Finally, upload the image to your [Docker Hub](https://hub.docker.com/) account.
+To upload image to access remotely, create a login in [Docker Hub](https://hub.docker.com/). 
+Login locally [instructions](https://docs.docker.com/engine/reference/commandline/login/).
+
+Use the following command to upload the image:
+````bash
+docker push sara980710/yolov5_env:v1.0
+````
+
+## Train the model in docker image
+Go to the desired repo and clone this repo
+````bash
+git clone https://github.com/Sara980710/yolov5
+````
+Adjust parameters to fit your dataset in following files:
+* models/yolov5n.yaml
+* datadef/airbus_kaggle.yaml
+* train/train_yolo.py
+
+Start the training
+````bash
+cd train/
+````
+````bash
+python3 train_yolo.py
+````
+The results will be written to 'runs/expX'where X is the training number. 
 
 ## Run the Docker image -locally
-:carousel_horse: Note that this step is only if would like to run the demo outside AiQu, for example, locally on your desktop. 
+Test the image locally on your desktop. 
 
-Fist make appropriate adjustments in the [scrips/run.sh](./scripts/run.sh) file, for example, set your path to the data. Also make sure that the paths in [guillemots.yaml](./datadef/guillemots.yaml) make sense.
-
-Finally, perhaps adjust the parameters in [main.py](./main.py).
+Change the settings in "train/run_locally.sh" and "main.py" for your fit, then use:
 
 ````bash
 cd scripts
