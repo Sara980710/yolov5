@@ -65,5 +65,5 @@ Change the settings in "train/run_locally.sh" and "main.py" for your fit, then u
 
 ````bash
 cd scripts
-sh rund.sh
+sh run.sh
 ````
