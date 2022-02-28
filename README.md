@@ -10,7 +10,7 @@
 This demo is using Linux, Ubuntu 20.04.
 
 ## Build own Docker image locally (and upload in Docker Hub)
-Write your Dockerfile in the "build/"-folder. If use the same image-name as the repository in your [Docker Hub](https://hub.docker.com/), in this example we use "sara980710/yolov5_env:v1.0". 
+Write your Dockerfile in the "build/"-folder. If use the same image-name as the repository in your [Docker Hub](https://hub.docker.com/), in this example we use "sara980710/yolov5_env:v1.0" where the version of the image is v1.0. 
 ````bash
 cd build
 sh build.sh
@@ -18,12 +18,15 @@ sh build.sh
 To upload image to access remotely, create a login in [Docker Hub](https://hub.docker.com/). 
 Login locally [instructions](https://docs.docker.com/engine/reference/commandline/login/).
 
+Create a repository with the same name as your image (without version number), ex. "sara980710/yolov5_env". 
+
 Use the following command to upload the image:
 ````bash
 docker push sara980710/yolov5_env:v1.0
 ````
 
 ## Train the model in docker image
+Start the image in you rengine using the uploaded image (don't forget the version number), ex. "sara980710/yolov5_env:v1.0"
 When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
