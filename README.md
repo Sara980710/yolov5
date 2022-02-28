@@ -24,7 +24,7 @@ docker push sara980710/yolov5_env:v1.0
 ````
 
 ## Train the model in docker image
-Go to the desired repo and clone this repo
+When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
 ````
