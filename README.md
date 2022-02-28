@@ -26,7 +26,10 @@ docker push sara980710/yolov5_env:v1.0
 ````
 
 ## Train the model in docker image
-Start the image in you rengine using the uploaded image (don't forget the version number), ex. "sara980710/yolov5_env:v1.0"
+Start the image in you rengine using the uploaded image (don't forget the version number), ex. "sara980710/yolov5_env:v1.0" using following mounted folders:
+* Your dataset --> data/
+* Folder where you save the results --> project/
+* 
 When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
