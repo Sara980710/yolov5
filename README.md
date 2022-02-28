@@ -58,7 +58,7 @@ python3 train_yolo.py
 ````
 The results will be written to 'runs/expX'where X is the training number. 
 
-## Run the Docker image -locally
+### Run the Docker image -locally
 Test the image locally on your desktop. 
 
 Change the settings in "train/run_locally.sh" and "main.py" for your fit, then use:
