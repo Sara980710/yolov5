@@ -12,5 +12,5 @@ git clone https://github.com/ultralytics/yolov5.git
 ````
 Start the training
 ````bash
-python3 train/train_yolo.py
+python3 train_yolo.py
 ````
