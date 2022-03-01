@@ -33,7 +33,7 @@ When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
 ````
-Bla bla bla...
+Follow the instructions in the [preprocessing directory](https://github.com/Sara980710/yolov5/tree/main/preprocessing). 
 
 ## Train the model in a docker image
 Start the image in you rengine using the uploaded image (don't forget the version number) and use following mounted folders:
@@ -65,5 +65,5 @@ Change the settings in "train/run_locally.sh" and "main.py" for your fit, then u
 
 ````bash
 cd scripts
-sh rund.sh
+sh run.sh
 ````
