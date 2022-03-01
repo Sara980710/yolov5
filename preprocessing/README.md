@@ -14,14 +14,18 @@ datasetdir/
 ````
 
 Use the convert.py script with following arguments:
-* datadir - directory to your downloaded dataset
-* source - the folder name of the images
-* width - of the image
-* height - of the image
+* datadir - path to your datasets (folder containing different datasets)
+* source - folder name of your specific dataset (images should be stored in a subfolder here called images)
+* width - of the images
+* height - of the images
 
 An example how to run convert.py in the terminal:
 ````bash
-python3 preprocessing/convert.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source images --width 768 --height 768
+python3 preprocessing/convert.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train --width 768 --height 768
+````
+In Aiqu:
+````bash
+python3 preprocessing/convert.py --datadir /data/ --source train --width 768 --height 768
 ````
 The output will then consist of a .txt-file for each image in a folder called labels:
 ````
