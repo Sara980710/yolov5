@@ -5,9 +5,9 @@ nc: 1
 names: [ 'boat']
 
 # Computer settings:
-train: ../datasets/test.txt
-val: ../datasets/test.txt
+#train: ../datasets/test.txt
+#val: ../datasets/test.txt
 
 # Aiqu settings:
-# train: /project/datasets/div_train.txt
-# val: /project/datasets/div_val.txt
+train: /project/datasets/div_train.txt
+val: /project/datasets/div_val.txt
