@@ -14,4 +14,3 @@ Start the training
 ````bash
 python3 train/train_yolo.py
 ````
-The results will be written to 'runs/expX'where X is the training number. 
