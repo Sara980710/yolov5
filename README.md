@@ -49,3 +49,8 @@ Change the settings in "train/run_locally.sh" and "main.py" for your fit, then u
 cd scripts
 sh run.sh
 ````
+
+## Inference
+````bash
+python3 yolov5/yolov5/detect.py --weights best.pt --img 768 --source dataset/test_v2/ --project dataset/
+````
