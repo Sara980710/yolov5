@@ -54,3 +54,6 @@ sh run.sh
 ````bash
 python3 yolov5/yolov5/detect.py --weights best.pt --img 768 --source dataset/test_v2/ --project dataset/
 ````
+
+https://www.codestudyblog.com/cs2112pyc/1223200556.html
+
