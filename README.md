@@ -25,17 +25,7 @@ Use the following command to upload the image:
 docker push user/repo:tag
 ````
 
-## Preprocessing in a docker image
-Start the image in you rengine using the uploaded image (don't forget the version number) and use following mounted folders:
-* Your dataset --> data/
-
-When you have started the image, go to the desired repo and clone this repo
-````bash
-git clone https://github.com/Sara980710/yolov5
-````
-Follow the instructions in the [preprocessing directory](https://github.com/Sara980710/yolov5/tree/main/preprocessing). 
-
-## Train the model in a docker image
+## Train or preprocessing in a docker image
 Start the image in you rengine using the uploaded image (don't forget the version number) and use following mounted folders:
 * Your dataset --> data/
 * Folder where you save the results --> project/
@@ -44,19 +34,11 @@ When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
 ````
-Adjust parameters to fit your dataset in following files:
-* models/yolov5n.yaml
-* datadef/airbus_kaggle.yaml
-* train/train_yolo.py
+Follow the instructions in the [preprocessing directory](https://github.com/Sara980710/yolov5/tree/main/preprocessing).
 
-Start the training
-````bash
-cd train/
-````
-````bash
-python3 train_yolo.py
-````
-The results will be written to 'runs/expX'where X is the training number. 
+  OR
+  
+Follow the instructions in the [train directory](https://github.com/Sara980710/yolov5/tree/main/train). 
 
 ### Run the Docker image -locally
 Test the image locally on your desktop. 
