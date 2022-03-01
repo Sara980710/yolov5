@@ -3,7 +3,7 @@
 from yolov5 import train
 
 train.run(
-    imgsz=416,
+    imgsz=768,
     epochs=2,
     batch_size=64,
     cfg="models/yolov5n.yaml",
