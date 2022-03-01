@@ -38,7 +38,7 @@ def main(opt):
 
     print(f"Number of files: {nr_of_images}")
 
-    X_train, X_val = train_test_split(files, test_size=train_size, shuffle=True)
+    X_train, X_val = train_test_split(files, train_size=train_size, shuffle=True)
     X_val, X_test = train_test_split(X_val, test_size=val_size/(1-train_size)) # 0.15 per list
 
     with open(path_all_file, "w") as output_all:
@@ -49,6 +49,7 @@ def main(opt):
                 output.write(f"{str(os.path.join(path_data_images, file))}\n")
                 output_all.write(f"{str(os.path.join(path_data_images, file))}\n")
         output.close()
+        print(f"{len(X_train)} images stored in {path_train_file}")
         
         with open(path_val_file, "w") as output:
 
@@ -56,6 +57,7 @@ def main(opt):
                 output.write(f"{str(os.path.join(path_data_images, file))}\n")
                 output_all.write(f"{str(os.path.join(path_data_images, file))}\n")
         output.close()
+        print(f"{len(X_val)} images stored in {path_val_file}")
 
         with open(path_test_file, "w") as output:
 
@@ -63,6 +65,7 @@ def main(opt):
                 output.write(f"{str(os.path.join(path_data_images, file))}\n")
                 output_all.write(f"{str(os.path.join(path_data_images, file))}\n")
         output.close()
+        print(f"{len(X_test)} images stored in {path_test_file}")
         
     output_all.close()
 
