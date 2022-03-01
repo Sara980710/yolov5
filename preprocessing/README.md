@@ -21,10 +21,12 @@ Use the convert.py script with following arguments:
 
 An example how to run convert.py in the terminal:
 ````bash
+cd yolov5
 python3 preprocessing/convert.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train --width 768 --height 768
 ````
 In Aiqu:
 ````bash
+cd yolov5
 python3 preprocessing/convert.py --datadir /data/ --source train --width 768 --height 768
 ````
 The output will then consist of a .txt-file for each image in a folder called labels:
@@ -45,14 +47,23 @@ datasetdir/
 
 ## Divide dataset into train, test and validation
 Use the divide.py script with following arguments:
-* datadir - directory to your downloaded dataset
-* yolodir - directory to this yolo-repo
-* source - the folder name of the images (or the path from datadir to images folder)
+* datadir - path to you datasets (folder containing different datasets)
+* source - folder name of source images (NOTE! images are directly stored in this folder)
+* savedir - path to where you want to save the txt-files
+* trainsize - size of the training-set in percent
+* valsize - size of the validation-set in percent
+
 * name - what you would like to name this collection of images
 
 An example how to run convert.py in the terminal:
 ````bash
-python3 preprocessing/divide.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --yolodir /home/sara/Desktop/Master-thesis/yolov5 --source train/images --name test
+cd yolov5
+python3 preprocessing/divide.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train/images --savedir /home/sara/Desktop/Master-thesis/yolov5/datasets/ --trainsize 0.7 --valsize 0.15 --name test
+````
+In Aiqu:
+````bash
+cd yolov5
+python3 preprocessing/divide.py --datadir /data/ --source train/images --savedir /project/datasets/  --name div
 ````
 Output will be in the yolo directory as .txt-files:
 ````
