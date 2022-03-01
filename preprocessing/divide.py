@@ -9,6 +9,8 @@ def parse_opt(known=False):
     parser.add_argument('--source', type=str, help='folder name of source images (images are directly stored in this folder)')
     parser.add_argument('--savedir', type=str, help='path to where you want to save the txt-files')
     parser.add_argument('--name', type=str, help='name of this collection')
+    parser.add_argument('--trainsize', type=float, default=0.7, help='size of the training-set in percent (optional)')
+    parser.add_argument('--valsize', type=float, default=0.15, help='size of the validation-set in percent (optional)')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
@@ -16,6 +18,9 @@ def parse_opt(known=False):
 def main(opt):
     # Create papths
     path_data_images = os.path.join(opt.datadir, opt.source)
+    train_size = opt.trainsize
+    val_size = opt.valsize
+    assert(train_size+val_size <= 1)
     
     path_datasets_txt = opt.savedir
     if not os.path.exists(path_datasets_txt):
@@ -33,8 +38,8 @@ def main(opt):
 
     print(f"Number of files: {nr_of_images}")
 
-    X_train, X_val = train_test_split(files, test_size=0.7, shuffle=True)
-    X_val, X_test = train_test_split(X_val, test_size=0.5) # 0.15 per list
+    X_train, X_val = train_test_split(files, test_size=train_size, shuffle=True)
+    X_val, X_test = train_test_split(X_val, test_size=val_size/(1-train_size)) # 0.15 per list
 
     with open(path_all_file, "w") as output_all:
 
