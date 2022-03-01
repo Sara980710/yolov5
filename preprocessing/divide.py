@@ -7,7 +7,7 @@ def parse_opt(known=False):
     parser = argparse.ArgumentParser()
     parser.add_argument('--datadir', type=str, help='path to you datasets (folder containing different datasets)')
     parser.add_argument('--source', type=str, help='folder name of source images (images are directly stored in this folder)')
-    parser.add_argument('--yolodir', type=str, help='path to yolov5 folder')
+    parser.add_argument('--savedir', type=str, help='path to where you want to save the txt-files')
     parser.add_argument('--name', type=str, help='name of this collection')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
@@ -17,7 +17,7 @@ def main(opt):
     # Create papths
     path_data_images = os.path.join(opt.datadir, opt.source)
     
-    path_datasets_txt = os.path.join(opt.yolodir,"datasets")
+    path_datasets_txt = opt.savedir
     if not os.path.exists(path_datasets_txt):
         os.makedirs(path_datasets_txt)
         print(f"'{path_datasets_txt}' directory is created!")
