@@ -34,6 +34,8 @@ When you have started the image, go to the desired repo and clone this repo
 ````bash
 git clone https://github.com/Sara980710/yolov5
 ````
+Use [Tmux](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/) to be able to connect to the terminal if your account is logged out from Aiqu. 
+
 Follow the instructions in the [preprocessing directory](https://github.com/Sara980710/yolov5/tree/main/preprocessing).
 
   OR
