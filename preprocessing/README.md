@@ -80,12 +80,13 @@ yolodir/
 
 ## Divide the dataset into boats/no boats
 Use the divide_boat_no_boat.py script with following arguments:
-* datadir - directory to your downloaded dataset
-* source - the folder name of the images (or the path from datadir to images folder)
+* sourcedir - path to the folder containing images
+* csv - your csv file (path)
+* destdir - folder where no_boat/boat directory is saved
 
 An example how to run convert.py in the terminal:
 ````bash
-python3 preprocessing/divide_boat_no_boat.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train_v2/images
+python3 preprocessing/divide_boat_no_boat.py --sourcedir /home/sara/Desktop/Master-thesis/dataset/images/ --csv /home/sara/Desktop/Master-thesis/dataset/train_ship_segmentations_v2.csv --destdir /home/sara/Desktop/Master-thesis/dataset/
 ````
-The output will be two new folders with sub-folders "boats/images/" and "no_boats/images/" where respectively image is copied to. 
+The output will be two new folders with "boats/" and "no_boats/" where respectively image is copied to. 
 
