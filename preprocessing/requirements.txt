@@ -2,6 +2,3 @@ pandas>=1.3.5
 numpy>=1.21.5
 opencv-python>=4.5.5
 scikit-learn>=0.23.2
-
-# Export addition
-tensorflow-gpu>=2.8.0
