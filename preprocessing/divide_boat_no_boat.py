@@ -6,19 +6,19 @@ from IPython.display import clear_output, display
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
-    parser.add_argument('--datadir', type=str, help='path to dataset')
-    parser.add_argument('--source', type=str, help='folder name of source images')
+    parser.add_argument('--sourcedir', type=str, help='path to the folder containing images')
+    parser.add_argument('--csv', type=str, help='your csv file (path)')
+    parser.add_argument('--destdir', type=str, help='folder where no_boat/boat directory is saved')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
 def main(opt):
     # Get target and source directories
-    dataset_folder = opt.datadir
-    images_path = os.path.join(dataset_folder, opt.source)
+    images_path = opt.sourcedir
 
-    destination_path_boats = f"{dataset_folder}/only_boats_test/images/"
-    destination_path_no_boats = f"{dataset_folder}/no_boats_test/images/"
+    destination_path_boats = f"{opt.destdir}/only_boats/"
+    destination_path_no_boats = f"{opt.destdir}/no_boats/"
 
     # Check if directory needs to be created
     tmp  = destination_path_boats.strip("images/")
@@ -37,7 +37,7 @@ def main(opt):
         print(f"'{destination_path_no_boats}' directory is created!")
 
     # Load csv-file
-    dataset_csv = f"{dataset_folder}/train_ship_segmentations_v2.csv"
+    dataset_csv = f"opt.csv"
 
     df = pd.read_csv(dataset_csv)
     print("csv-file loaded:")
