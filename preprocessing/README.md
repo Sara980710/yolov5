@@ -92,5 +92,6 @@ The output will be two new folders with "boats/" and "no_boats/" where respectiv
 
 # Export to other formats
 ````bash
+cd yolov5/yolov5/
 python export.py --weights /home/sara/Desktop/Master-thesis/best.pt --include tflite
 ````
