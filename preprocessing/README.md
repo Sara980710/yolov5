@@ -90,3 +90,7 @@ python3 preprocessing/divide_boat_no_boat.py --sourcedir /home/sara/Desktop/Mast
 ````
 The output will be two new folders with "boats/" and "no_boats/" where respectively image is copied to. 
 
+# Export to other formats
+````bash
+python export.py --weights /home/sara/Desktop/Master-thesis/best.pt --include tflite
+````
