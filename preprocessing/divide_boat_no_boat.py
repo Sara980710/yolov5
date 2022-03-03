@@ -17,7 +17,7 @@ def main(opt):
     # Get target and source directories
     images_path = opt.sourcedir
 
-    destination_path_boats = f"{opt.destdir}/only_boats/"
+    destination_path_boats = f"{opt.destdir}/boats/"
     destination_path_no_boats = f"{opt.destdir}/no_boats/"
 
     # Check if directory needs to be created
