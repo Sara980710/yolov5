@@ -5,5 +5,5 @@ nc: 1
 names: [ 'boat']
 
 # Computer settings:
-train: ../datasets/test.txt
-val: ../datasets/test.txt
+train: ../datasets/_saratest.txt
+val: ../datasets/_saratest.txt
