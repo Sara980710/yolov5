@@ -56,6 +56,6 @@ yolov5/train.py \
 https://github.com/ultralytics/yolov5/issues/2377
 
 ## Trained so far...
-| Epochs  | Batch size | workers | memory usage | exp | job ID |
-| ------ | --------- | ------ | ----------- | ---- | ------ |
-| 300  | 64  | - | 10G | 8 | 253 |
+| Epochs  | Batch size | workers | memory usage | exp | job ID | GFLOPs |
+| ------ | --------- | ------ | ----------- | ---- | ------ | - |
+| 300  | 64  | 8 | 10G | 9 | 253 | 4.2 |
