@@ -53,6 +53,6 @@ yolov5/train.py \
 ````
 
 ## Trained so far...
-| Epochs  | Batch size | exp |
+| Epochs  | Batch size | workers |
 | ------ | --------- | ---- |
-| 3  | 1024  |
+| 300  | 64  | 2 |
