@@ -55,4 +55,4 @@ yolov5/train.py \
 ## Trained so far...
 | Epochs  | Batch size | exp |
 | ------ | --------- | ---- |
-| 3  | 128  |
+| 3  | 1024  |
