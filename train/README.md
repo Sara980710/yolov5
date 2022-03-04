@@ -58,4 +58,4 @@ https://github.com/ultralytics/yolov5/issues/2377
 ## Trained so far...
 | Epochs  | Batch size | workers | memory usage | exp | job ID |
 | ------ | --------- | ------ | ----------- | ---- | ------ |
-| 300  | 64  | 2 | 10G | 8 | 253 |
+| 300  | 64  | - | 10G | 8 | 253 |
