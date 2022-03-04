@@ -40,6 +40,11 @@ Follow the instructions in the [preprocessing directory](https://github.com/Sara
   
 Follow the instructions in the [train directory](https://github.com/Sara980710/yolov5/tree/main/train). 
 
+  OR
+  
+Follow the instructions in the [export directory](https://github.com/Sara980710/yolov5/tree/main/export). 
+
+
 ### Run the Docker image -locally
 Test the image locally on your desktop. 
 
