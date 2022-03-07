@@ -60,3 +60,6 @@ sh run.sh
 python3 yolov5/yolov5/detect.py --weights best.pt --img 768 --source dataset/test_v2/ --project dataset/
 ````
 
+## SSH
+https://docs.aiqu.ai/include/user_docs/ports.html
+
