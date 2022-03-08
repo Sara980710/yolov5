@@ -7,3 +7,4 @@ names: [ 'boat']
 # Aiqu settings:
 train: /project/datasets/div_train.txt
 val: /project/datasets/div_val.txt
+test: /project/datasets/div_test.txt
