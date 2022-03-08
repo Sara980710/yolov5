@@ -48,4 +48,4 @@ https://github.com/ultralytics/yolov5/issues/2377
 ## Trained so far...
 | Epochs  | Batch size | workers | exp | job ID | GPUs |
 | ------ | --------- | ------ | ----------- | ---- | ------ | 
-| 300  | 256  | 16 | 15 | 306 | 2 | 
+| 300  | 256  | 16 | 16 | 306 | 2 | 
