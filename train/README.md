@@ -39,17 +39,7 @@ Using multiple (ex. 2) GUP:s Aiqu:
 [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/)
 nproc_per_node is number of cores.
 ````bash
-python3 -m torch.distributed.launch \
---nproc_per_node 2 \
-yolov5/train.py \
---imgsz 768 \
---epochs 300 \
---batch-size 64 \
---cfg models/yolov5n.yaml \
---data datadef/airbus_kaggle_aiqu.yaml \
---weights yolov5n.pt \
---project /project/yolo_results \
---cache
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --workers 8 --device 0,1
 ````
 
 ## Batch size
