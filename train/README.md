@@ -8,7 +8,7 @@ Adjust parameters to fit your dataset in following files:
 #### Clone the original yolov5 repo
 ````bash
 cd yolov5/
-git clone https://github.com/ultralytics/yolov5.git
+git clone -b v6.1 https://github.com/ultralytics/yolov5.git
 ````
 #### Start the training
 * batch_size: -1 gives AutoBatch 
@@ -43,19 +43,19 @@ python3 -m torch.distributed.launch \
 --nproc_per_node 2 \
 yolov5/train.py \
 --imgsz 768 \
---epochs 2 \
---batch_size 64 \
+--epochs 300 \
+--batch-size 64 \
 --cfg models/yolov5n.yaml \
 --data datadef/airbus_kaggle_aiqu.yaml \
 --weights yolov5n.pt \
---project runs/train \
---workers 2
+--project /project/yolo_results \
+--cache
 ````
 
 ## Batch size
 https://github.com/ultralytics/yolov5/issues/2377
 
 ## Trained so far...
-| Epochs  | Batch size | workers | memory usage | exp | job ID | GFLOPs |
-| ------ | --------- | ------ | ----------- | ---- | ------ | - |
-| 300  | 64  | 8 | 10G | 9 | 253 | 4.2 |
+| Epochs  | Batch size | workers | memory usage | exp | job ID | GPUs | Other |
+| ------ | --------- | ------ | ----------- | ---- | ------ | - | - |
+| 300  | 128  | 16 | 9.68G | 2 | 253 | 2 | 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs |
