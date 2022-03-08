@@ -25,13 +25,13 @@ python3 yolov5/train.py \
 ````
 Using one GPU Aiqu:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0
+python3 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 --resume /project/yolo_results/exp13/weights/best.pt
 ````
 Using multiple (ex. 2) GUP:s Aiqu:
 [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/)
 nproc_per_node is number of cores.
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 128 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 128 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 1 --resume /project/yolo_results/exp13/weights/best.pt
 ````
 
 ## Batch size
