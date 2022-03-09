@@ -50,7 +50,7 @@ https://github.com/ultralytics/yolov5/issues/2377
 | Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights |
 | ------ | --------- | ------ | ----------- | ---- | ------ | --|
 | 59  | 256  | 16 | 16 | 306 | 2 | yes |
-| 59  | 256  | 16 | 16 | 309 | 2 | no |
+| 59  | 256  | 16 | 17 | 309 | 2 | no |
 
 # Validation
 * --task, 'train, val, test, speed or study'
