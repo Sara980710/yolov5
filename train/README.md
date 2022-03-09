@@ -17,7 +17,7 @@ wandb login
 use your token from your project to connect
 
 ### Start the training
-* batch_size: -1 gives AutoBatch 
+* batch_size: -1 gives AutoBatch (only for one GPU)
 #### Using one GPU:
 ````bash
 python3 yolov5/train.py \
@@ -46,6 +46,12 @@ If you want to resume a run use --resume /project/yolo_results/exp13/weights/bes
 https://github.com/ultralytics/yolov5/issues/2377
 
 ## Trained so far...
-| Epochs  | Batch size | workers | exp | job ID | GPUs |
-| ------ | --------- | ------ | ----------- | ---- | ------ | 
-| 300  | 256  | 16 | 16 | 306 | 2 | 
+| Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights |
+| ------ | --------- | ------ | ----------- | ---- | ------ | --|
+| 59  | 256  | 16 | 16 | 306 | 2 | yes |
+
+# Validation
+* --task, 'train, val, test, speed or study'
+````bash
+python3 yolov5/val.py --imgsz 768 --batch-size 256 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0,1 --task test --save-txt
+````
