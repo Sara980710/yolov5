@@ -59,8 +59,9 @@ python3 yolov5/val.py --imgsz 768 --batch-size 256 --data datadef/airbus_kaggle_
 ````
 
 ## test for 28884 images and 12416 labels
-| training  | Batch size | workers | exp | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
-| --------- | --------- | -------- | --- | ---- | - | - | ------ | ---------- | ----- |
-| 16  | 256  | 16 | 3 |  2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
-| 17  | 256  | 16 | 4 |  2 | no |
+| exp | training  | Batch size | workers | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
+| --- | --------- | ---------- | ------- | ---- | - | - | ------ | ---------- | ----- |
+| 3   | 16  | 256  | 16 | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
+| 4   | 17  | 256  | 16 | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
+
 
