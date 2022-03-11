@@ -58,7 +58,9 @@ https://github.com/ultralytics/yolov5/issues/2377
 python3 yolov5/val.py --imgsz 768 --batch-size 256 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0,1 --task test --save-txt --single-cls
 ````
 
-Speed: 0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768)
+## test for 28884 images and 12416 labels
+| training  | Batch size | workers | exp | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
+| --------- | --------- | -------- | --- | ---- | - | - | ------ | ---------- | ----- |
+| 16  | 256  | 16 | 3 |  2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
+| 17  | 256  | 16 | 4 |  2 | no |
 
- Class     Images     Labels      P          R        mAP@.5    mAP@.5:.95                                        
- all      28884      12416      0.767      0.661      0.711      0.442
