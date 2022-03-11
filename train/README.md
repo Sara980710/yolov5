@@ -47,21 +47,23 @@ If you want to resume a run use --resume /project/yolo_results/exp13/weights/bes
 https://github.com/ultralytics/yolov5/issues/2377
 
 ## Trained so far...
-| Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights |
-| ------ | --------- | ------ | ----------- | ---- | ------ | --|
-| 59  | 256  | 16 | 16 | 306 | 2 | yes |
-| 59  | 256  | 16 | 17 | 309 | 2 | no |
+| Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
+| ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
+| 59  | 256  | 16 | 16 | 306 | 2 | yolov5n | solar-wind-2 |
+| 82  | 256  | 16 | 17 | 309 | 2 | no | iconic-bee-4 |
+| -  | 256  | 16 | 18 | 348 | 2 | yolov5s | legendary-wood-5 |
 
 # Validation
 * --task, 'train, val, test, speed or study'
 ````bash
-python3 yolov5/val.py --imgsz 768 --batch-size 256 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0,1 --task test --save-txt --single-cls
+python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0 --task test --save-txt
 ````
 
 ## test for 28884 images and 12416 labels
-| exp | training  | Batch size | workers | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
-| --- | --------- | ---------- | ------- | ---- | - | - | ------ | ---------- | ----- |
-| 3   | 16  | 256  | 16 | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
-| 4   | 17  | 256  | 16 | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
+| exp | training  | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
+| --- | --------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
+| 3   | 16/best  | 256   | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
+| 4   | 17/best  | 256   | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
+| 1   | 16/best  | 1     | 1 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
 
 
