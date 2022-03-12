@@ -41,11 +41,10 @@ nproc_per_node is number of cores.
 ````bash
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache
 ````
-resume training:
+resume training (you can chane nr epochs in opt.yaml in the exp-folder)
 ````bash
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 0,1 --save-period 10 --cache --resume /project/yolo_results/exp13/weights/best.pt
 ````
-If you want to resume a run use --resume /project/yolo_results/exp13/weights/best.pt
 
 ## Batch size
 https://github.com/ultralytics/yolov5/issues/2377
