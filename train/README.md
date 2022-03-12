@@ -49,6 +49,9 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 
 ## Batch size
 https://github.com/ultralytics/yolov5/issues/2377
 
+## Models
+yolov5n.pt: 213 layers, 7012822 parameters, 0 gradients, 15.8 GFLOPs
+
 ## Trained so far...
 | Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
 | ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
@@ -63,9 +66,11 @@ python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_ai
 ````
 
 ## test for 28884 images and 12416 labels
-| exp | training  | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
-| --- | --------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
+| exp | training   | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
+| --- | ---------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
 | 3   | 16/epoch52 | 256   | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
-| 4   | 17/best  | 256   | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
-| 1   | 16/epoch52  | 1     | 1 | 0.755 | 0.63  | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 7   | 17/last  | 1     | 1 | 0.766 | 0.622 | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |??
+| 4   | 17/best    | 256   | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
+| 1   | 16/epoch52 | 1     | 1 | 0.755 | 0.63  | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
+| 7   | 17/last    | 1     | 1 | 0.766 | 0.622 | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
+| 11  | 16/epoch80 | 1     | 1 | 0.787 | 0.653 | 0.716 | 0.447 |  0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
+| 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
