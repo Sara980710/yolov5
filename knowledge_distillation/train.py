@@ -130,6 +130,20 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     else:
         model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
 
+    # Teacher model in knowledge distillation
+    if opt.kd_weights:
+        kd_weights = opt.kd_weights
+
+        check_suffix(kd_weights, '.pt')  # check weights
+        assert kd_weights.endswith('.pt'), f"Teacher weights {kd_weights} is not pretrained"
+
+        with torch_distributed_zero_first(LOCAL_RANK):
+            kd_weights = attempt_download(kd_weights)  # download if not found locally
+        kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
+        kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+
+        LOGGER.info(f'Teacher model for KD is loaded from {weights}')  # report
+
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
     for k, v in model.named_parameters():
@@ -213,10 +227,14 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         LOGGER.warning('WARNING: DP not recommended, use torch.distributed.run for best DDP Multi-GPU results.\n'
                        'See Multi-GPU Tutorial at https://github.com/ultralytics/yolov5/issues/475 to get started.')
         model = torch.nn.DataParallel(model)
+        if opt.kd_weights:
+            kd_model = torch.nn.DataParallel(kd_model)
 
     # SyncBatchNorm
     if opt.sync_bn and cuda and RANK != -1:
         model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model).to(device)
+        if opt.kd_weights:
+            kd_model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(kd_model).to(device)
         LOGGER.info('Using SyncBatchNorm()')
 
     # Trainloader
@@ -254,6 +272,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     # DDP mode
     if cuda and RANK != -1:
         model = DDP(model, device_ids=[LOCAL_RANK], output_device=LOCAL_RANK)
+        if opt.kd_weights:
+            kd_model = DDP(kd_model, device_ids=[LOCAL_RANK], output_device=LOCAL_RANK)
 
     # Model attributes
     nl = de_parallel(model).model[-1].nl  # number of detection layers (to scale hyps)
@@ -265,6 +285,28 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     model.hyp = hyp  # attach hyperparameters to model
     model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
     model.names = names
+
+    if opt.kd_weights:
+        kd_model.nc = nc  # attach number of classes to model
+        kd_model.hyp = hyp  # attach hyperparameters to model
+        kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
+        kd_model.names = names
+
+        # Freeze all layers
+        for param in kd_model.parameters():
+            param.requires_grad = False
+
+        # Get dimensions from dummy data
+        dummy = torch.zeros((1, 3, opt.imgsz, opt.imgsz), device=device)
+        targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(device)
+
+        _, student_features, _ = model(dummy, target=targets)
+        _, teacher_features, _ = kd_model(dummy, target=targets) 
+        
+        _, student_channel, student_out_size, _ = student_features.shape
+        _, teacher_channel, teacher_out_size, _ = teacher_features.shape
+        
+        stu_feature_adapt = nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU())
 
     # Start training
     t0 = time.time()
@@ -283,6 +325,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                 f'Starting training for {epochs} epochs...')
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
+
+        if opt.kd_weights:
+            kd_model.eval()
 
         # Update image weights (optional, single-GPU only)
         if opt.image_weights:
@@ -327,8 +372,15 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
             # Forward
             with amp.autocast(enabled=cuda):
-                pred = model(imgs)  # forward
-                loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
+                if opt.kd_weights:
+                    targets = targets.to(device)
+                    student_pred, student_features, _ = model(imgs, target=targets)  # forward
+                    _, teacher_features, teacher_mask = kd_model(imgs, target=targets)  # forward
+                    loss, loss_items = compute_loss(student_pred, targets, stu_feature_adapt(student_features), teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
+                else:
+                    pred = model(imgs)  # forward
+                    loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
+
                 if RANK != -1:
                     loss *= WORLD_SIZE  # gradient averaged between devices in DDP mode
                 if opt.quad:
@@ -492,6 +544,8 @@ def parse_opt(known=False):
     parser.add_argument('--bbox_interval', type=int, default=-1, help='W&B: Set bounding-box image logging interval')
     parser.add_argument('--artifact_alias', type=str, default='latest', help='W&B: Version of dataset artifact to use')
 
+    parser.add_argument('--kd_weights', type=str, default='', help='initial weights path to teacher in knowledge distillation')
+    
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
