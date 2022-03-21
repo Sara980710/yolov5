@@ -1,5 +1,11 @@
 # Preprocessing data
 
+Test locally by starting docker container:
+````bash
+docker run -it sara980710/yolov5_kd_env:v1.0
+````
+
+
 ## Convert from Kaggle Airbus data to YOLOv5 format using convert.py
 Make sure that your data is in a directory with the files in following structure
 ````
@@ -21,12 +27,10 @@ Use the convert.py script with following arguments:
 
 An example how to run convert.py in the terminal:
 ````bash
-cd yolov5
 python3 preprocessing/convert.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train --width 768 --height 768
 ````
 In Aiqu:
 ````bash
-cd yolov5
 python3 preprocessing/convert.py --datadir /data/ --source train --width 768 --height 768
 ````
 The output will then consist of a .txt-file for each image in a folder called labels:
@@ -57,7 +61,6 @@ Use the divide.py script with following arguments:
 
 An example how to run convert.py in the terminal:
 ````bash
-cd yolov5
 python3 preprocessing/divide.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train/images --savedir /home/sara/Desktop/Master-thesis/yolov5/datasets/ --trainsize 0.7 --valsize 0.15 --name test
 ````
 In Aiqu:
