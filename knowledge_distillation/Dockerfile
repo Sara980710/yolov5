@@ -11,4 +11,7 @@ RUN pip install --no-cache -r requirements.txt
 WORKDIR ../
 
 # Clone from github
-RUN 
+RUN git clone https://github.com/Sara980710/yolov5 
+WORKDIR ../yolov5/
+RUN git clone -b v6.1 https://github.com/ultralytics/yolov5.git
+COPY train.py yolov5/
