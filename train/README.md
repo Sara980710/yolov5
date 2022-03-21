@@ -5,11 +5,6 @@ Adjust parameters to fit your dataset in following files:
 * datadef/airbus_kaggle.yaml - To change the paths to your .txt files for data
 * train/train_yolo.py - Other settings in the training
 
-#### Clone the original yolov5 repo
-````bash
-cd yolov5/
-git clone -b v6.1 https://github.com/ultralytics/yolov5.git
-````
 #### Use Weights and Biases
 ````bash
 wandb login
@@ -26,11 +21,11 @@ GPU:
 docker run -it  -v /home/sara/Documents/Master-thesis/dataset/train:/example_data sara980710/yolov5_kd_env:v1.0
 ````
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --save-period 1 
+python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --save-period 1 
 ````
 #### Using one GPU Aiqu:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 
+python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 
 ````
 If you want to resume a run use --resume /project/yolo_results/exp13/weights/best.pt
 
@@ -38,7 +33,7 @@ If you want to resume a run use --resume /project/yolo_results/exp13/weights/bes
 [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/)
 nproc_per_node is number of cores.
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache
 ````
 resume training (you can chane nr epochs in opt.yaml in the exp-folder)
 ````bash
