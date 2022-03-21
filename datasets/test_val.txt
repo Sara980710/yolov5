@@ -1,0 +1,15 @@
+/home/sara/Documents/Master-thesis/dataset/train/images/fde3be356.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdd1be404.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdd0d35c1.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdc9e9d2f.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdd84ff77.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdc2ee532.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fddb56648.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdbfc9069.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdd866b18.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdc25b63d.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fde37a027.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdc4a56b4.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdc3d0c7e.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdcbcf80d.jpg
+/home/sara/Documents/Master-thesis/dataset/train/images/fdcd835ec.jpg
