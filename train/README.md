@@ -52,6 +52,7 @@ yolov5n.pt: 213 layers, 7012822 parameters, 0 gradients, 15.8 GFLOPs
 | 81  | 256  | 16 | 16 | 306 | 2 | yolov5n | solar-wind-2 |
 | 82  | 256  | 16 | 17 | 309 | 2 | no | iconic-bee-4 |
 | 81  | 256  | 16 | 1 | 348 | 2 | yolov5s | legendary-wood-5 |
+| ?  | 100  | 16 | 21 | 348 | 2 | yolov5l | jumping-shape-11 |
 
 # Validation
 * --task, 'train, val, test, speed or study'
