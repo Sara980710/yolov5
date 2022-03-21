@@ -5,6 +5,10 @@
 
 [Inference TF Lite](https://www.tensorflow.org/lite/guide/inference)
 
+https://github.com/wonbeomjang/yolov5-knowledge-distillation
+
+https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9731227
+
 ## Prerequisites
 This demo is using Linux, Ubuntu 20.04.
 
