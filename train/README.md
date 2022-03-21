@@ -5,11 +5,6 @@ Adjust parameters to fit your dataset in following files:
 * datadef/airbus_kaggle.yaml - To change the paths to your .txt files for data
 * train/train_yolo.py - Other settings in the training
 
-#### Clone the original yolov5 repo
-````bash
-cd yolov5/
-git clone -b v6.1 https://github.com/ultralytics/yolov5.git
-````
 #### Use Weights and Biases
 ````bash
 wandb login
