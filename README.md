@@ -1,4 +1,5 @@
-# Master thesis yolov5
+# Master's thesis - yolov5
+&rarr;[Link to master's thesis repo](https://github.com/Sara980710/master_thesis)
 
 [YOLOv5 repo](https://github.com/ultralytics/yolov5)
 
