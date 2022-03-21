@@ -18,16 +18,15 @@ use your token from your project to connect
 
 ### Start the training
 * batch_size: -1 gives AutoBatch (only for one GPU)
-#### Using one GPU:
+* data: path to dataset configuration file (yaml)
+* device:  '0' for one GPU or '0,1,2,3' for multiple gpus or 'cpu'
+#### Test training locally:
+GPU: 
 ````bash
-python3 yolov5/train.py \
---imgsz 768 \
---epochs 2 \
---batch_size 64 \
---cfg models/yolov5n.yaml \
---data datadef/airbus_kaggle.yaml \
---weights yolov5n.pt \
---project runs/train
+docker run -it  -v /home/sara/Documents/Master-thesis/dataset/train:/example_data sara980710/yolov5_kd_env:v1.0
+````
+````bash
+python3 yolov5/train.py --imgsz 768 --epochs 300 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --save-period 1 
 ````
 #### Using one GPU Aiqu:
 ````bash
