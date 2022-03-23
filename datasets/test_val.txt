@@ -1,15 +1,3 @@
-/example_data/images/fde3be356.jpg
-/example_data/images/fdd1be404.jpg
-/example_data/images/fdd0d35c1.jpg
-/example_data/images/fdc9e9d2f.jpg
-/example_data/images/fdd84ff77.jpg
-/example_data/images/fdc2ee532.jpg
-/example_data/images/fddb56648.jpg
-/example_data/images/fdbfc9069.jpg
-/example_data/images/fdd866b18.jpg
-/example_data/images/fdc25b63d.jpg
-/example_data/images/fde37a027.jpg
 /example_data/images/fdc4a56b4.jpg
-/example_data/images/fdc3d0c7e.jpg
-/example_data/images/fdcbcf80d.jpg
-/example_data/images/fdcd835ec.jpg
+/example_data/images/fdc4b0c62.jpg
+

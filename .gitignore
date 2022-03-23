@@ -1,10 +1,10 @@
 # Own
 yolov5/
-datasets/
 !*/datasets/test_all.txt
 !*/datasets/test_test.txt
 !*/datasets/test_train.txt
 !*/datasets/test_val.txt
+datasets/
 runs/
 *.pt
 
