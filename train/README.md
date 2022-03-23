@@ -5,17 +5,18 @@ Adjust parameters to fit your dataset in following files:
 * datadef/airbus_kaggle.yaml - To change the paths to your .txt files for data
 * train/train_yolo.py - Other settings in the training
 
-#### Use Weights and Biases
+## Setup docker image
+Goto train directory and make sure to check following:
+- ".netrc": change password to your wandb API token found in [account settings](https://wandb.ai/settings)
+- "build.sh": change the image name and tag to your desired one
 ````bash
-wandb login
+sh build.sh
 ````
-use your token from your project to connect
-
-### Start the training
+## Start the training
 * batch_size: -1 gives AutoBatch (only for one GPU)
 * data: path to dataset configuration file (yaml)
 * device:  '0' for one GPU or '0,1,2,3' for multiple gpus or 'cpu'
-#### Test training locally:
+### Test training locally
 GPU: 
 ````bash
 docker run -it  -v /home/sara/Documents/Master-thesis/dataset/train:/example_data sara980710/yolov5_kd_env:v1.0
@@ -23,30 +24,32 @@ docker run -it  -v /home/sara/Documents/Master-thesis/dataset/train:/example_dat
 ````bash
 python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --save-period 1 
 ````
-#### Using one GPU Aiqu:
+### Aiqu
+One GPU:
 ````bash
 python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 
 ````
-If you want to resume a run use --resume /project/yolo_results/exp13/weights/best.pt
-
-#### Using multiple (ex. 2) GUP:s Aiqu:
-[From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/)
-nproc_per_node is number of cores.
+Multiple GUP:s [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/) (nproc_per_node is number of cores).
 ````bash
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache
 ````
-resume training (you can chane nr epochs in opt.yaml in the exp-folder)
+resume training (you can chane nr epochs in opt.yaml in the exp-folder):
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 0,1 --save-period 10 --cache --resume /project/yolo_results/exp13/weights/best.pt
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 0,1 --save-period 10 --cache --resume /project/yolo_results/exp16/weights/best.pt
+````
+train with knowledge distillation:
+````bash
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp/weights/epoch80.pt
 ````
 
 ## Batch size
 https://github.com/ultralytics/yolov5/issues/2377
 
-## Models
+## Results 
+### Models
 yolov5n.pt: 213 layers, 7012822 parameters, 0 gradients, 15.8 GFLOPs
 
-## Trained so far...
+### Trained so far...
 | Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
 | ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
 | 81  | 256  | 16 | 16 | 306 | 2 | yolov5n | solar-wind-2 |
@@ -54,13 +57,13 @@ yolov5n.pt: 213 layers, 7012822 parameters, 0 gradients, 15.8 GFLOPs
 | 81  | 256  | 16 | 1 | 348 | 2 | yolov5s | legendary-wood-5 |
 | ?  | 100  | 16 | 21 | 348 | 2 | yolov5l | jumping-shape-11 |
 
-# Validation
+## Validation
 * --task, 'train, val, test, speed or study'
 ````bash
 python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0 --task test --save-txt
 ````
 
-## test for 28884 images and 12416 labels
+### test for 28884 images and 12416 labels
 | exp | training   | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
 | --- | ---------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
 | 3   | 16/epoch52 | 256   | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
