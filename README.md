@@ -3,8 +3,6 @@
 
 [YOLOv5 repo](https://github.com/ultralytics/yolov5)
 
-[Inference TF Lite](https://www.tensorflow.org/lite/guide/inference)
-
 https://github.com/wonbeomjang/yolov5-knowledge-distillation
 
 https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9731227
