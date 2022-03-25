@@ -61,9 +61,9 @@ https://github.com/ultralytics/yolov5/issues/2377
 
 ## Results 
 ### Models
-yolov5n.pt: 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs
-yolov5n.pt: 270 layers, 7022326 parameters, 7022326 gradients, 15.8 GFLOPs
-yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
+- yolov5n.pt: 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs
+- yolov5n.pt: 270 layers, 7022326 parameters, 7022326 gradients, 15.8 GFLOPs
+- yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
 
 ### Trained so far...
 | Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
