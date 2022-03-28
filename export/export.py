@@ -322,9 +322,10 @@ def export_tflite(keras_model, im, file, int8, data, ncalib, prefix=colorstr('Te
         converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
         if half:
             output_path = str(file).replace('.pt', '-fp16.tflite')
+            converter.target_spec.supported_types = [tf.float16]
         else:
             output_path = str(file).replace('.pt', '-fp16.tflite')
-            converter.target_spec.supported_types = [tf.float16]
+            converter.target_spec.supported_types = [tf.float32]
         LOGGER.info(f'----------this is supported options {converter.target_spec.supported_types} ')
         print(converter.target_spec.supported_types)
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
