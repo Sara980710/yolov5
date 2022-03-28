@@ -88,3 +88,27 @@ python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_ai
 | 7   | 17/last    | 1     | 1 | 0.766 | 0.622 | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 | 11  | 16/epoch80 | 1     | 1 | 0.787 | 0.653 | 0.716 | 0.447 |  0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 | 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
+
+# Export model 
+Export ussing export.py
+
+````bash
+python yolov5/export.py --weights /home/sara/Documents/Master-thesis/yolov5/models/yolov5n.pt --include tflite --imgsz 768
+````
+or
+````bash
+cd yolov5/
+python export.py --weights /home/sara/Desktop/Master-thesis/best.pt --include onnx --imgsz 768
+````
+
+Aiqu:
+````bash
+python3 yolov5/export.py --weights /project/yolo_results/exp/weights/best.pt --include tflite --imgsz 768 --name somename
+````
+````bash
+python3 export.py --weights /project/yolo_results/exp/weights/best.pt --include onnx --imgsz 768
+````
+
+````bash
+python3 detect.py --weights /project/yolo_results/exp/weights/best-fp16.tflite --img 768 --source /data/test_v2/ --project /project/yolo_results
+````
