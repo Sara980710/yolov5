@@ -12,17 +12,31 @@ Goto train directory and make sure to check following:
 ````bash
 sh build.sh
 ````
+## Upload to Docker Hub (required for access remotely)
+To upload image to access remotely, create a login in [Docker Hub](https://hub.docker.com/). 
+Login locally [instructions](https://docs.docker.com/engine/reference/commandline/login/).
+
+Use the following command to upload the image:
+````bash
+docker push user/repo:tag
+````
+
 ## Start the training
 * batch_size: -1 gives AutoBatch (only for one GPU)
 * data: path to dataset configuration file (yaml)
 * device:  '0' for one GPU or '0,1,2,3' for multiple gpus or 'cpu'
 ### Test training locally
-GPU: 
+CPU: 
 ````bash
-docker run -it  -v /home/sara/Documents/Master-thesis/dataset/train:/example_data sara980710/yolov5_kd_env:v1.0
+docker run --shm-size=1g  -it  -v /home/sara/Documents/Master-thesis/dataset/only_boats:/example_data sara980710/yolov5_kd_env:v1.0
 ````
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --save-period 1 
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --workers 1
+````
+
+train with knowledge distillation:
+````bash
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights yolov5s.pt
 ````
 ### Aiqu
 One GPU:
@@ -47,7 +61,9 @@ https://github.com/ultralytics/yolov5/issues/2377
 
 ## Results 
 ### Models
-yolov5n.pt: 213 layers, 7012822 parameters, 0 gradients, 15.8 GFLOPs
+- yolov5n.pt: 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs
+- yolov5n.pt: 270 layers, 7022326 parameters, 7022326 gradients, 15.8 GFLOPs
+- yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
 
 ### Trained so far...
 | Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |

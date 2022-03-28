@@ -27,7 +27,7 @@ Use the convert.py script with following arguments:
 
 An example how to run convert.py in the terminal:
 ````bash
-python3 preprocessing/convert.py --datadir /home/sara/Desktop/Master-thesis/dataset/ --source train --width 768 --height 768
+python3 preprocessing/convert.py --datadir /home/sara/Documents/Master-thesis/dataset/ --source only_boats --width 768 --height 768
 ````
 In Aiqu:
 ````bash
@@ -61,7 +61,7 @@ Use the divide.py script with following arguments:
 
 An example how to run convert.py in the terminal:
 ````bash
-python3 preprocessing/divide.py --datadir /home/sara/Documents/Master-thesis/dataset/ --source train/images --savedir /home/sara/Documents/Master-thesis/yolov5/datasets/ --trainsize 0.7 --valsize 0.15 --name test
+python3 preprocessing/divide.py --datadir /home/sara/Documents/Master-thesis/dataset/ --source only_boats/images --savedir /home/sara/Documents/Master-thesis/yolov5/datasets/ --trainsize 0.7 --valsize 0.15 --name test
 ````
 In Aiqu:
 ````bash
