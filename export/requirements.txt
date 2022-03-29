@@ -1,3 +1,0 @@
-# Export addition
-tensorflow-gpu>=2.8.0
-seaborn

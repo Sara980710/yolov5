@@ -142,7 +142,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
         kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
 
-        LOGGER.info(f'Teacher model for KD is loaded from {weights}')  # report
+        LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
 
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze

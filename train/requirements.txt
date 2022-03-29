@@ -20,6 +20,5 @@ seaborn>=0.11.0
 
 thop  # FLOPs computation
 
-
-
-
+# Export ------------------------------------
+tensorflow-cpu==2.8
