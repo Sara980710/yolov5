@@ -109,6 +109,8 @@ python3 yolov5/export.py --weights /project/yolo_results/exp/weights/best.pt --i
 python3 export.py --weights /project/yolo_results/exp/weights/best.pt --include onnx --imgsz 768
 ````
 
+# Inference 
+## Using yolov5 repo
 ````bash
-python3 detect.py --weights /project/yolo_results/exp/weights/best-fp16.tflite --img 768 --source /data/test_v2/ --project /project/yolo_results
+python3 yolov5/detect.py --weights /project/yolo_results/exp16/weights/epoch80-fp16.tflite --img 768 --source /data/test_v2/ --project /project/yolo_inference --device 0 --data datadef/airbus_kaggle.yaml
 ````
