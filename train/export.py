@@ -310,7 +310,7 @@ def export_pb(keras_model, im, file, prefix=colorstr('TensorFlow GraphDef:')):
         LOGGER.info(f'\n{prefix} export failure: {e}')
 
 
-def export_tflite(keras_model, im, file, int8, data, ncalib, prefix=colorstr('TensorFlow Lite:'), half=False):
+def export_tflite(keras_model, im, file, int8, data, ncalib, prefix=colorstr('TensorFlow Lite:'), keep_f32=False):
     # YOLOv5 TensorFlow Lite export
     try:
         import tensorflow as tf
@@ -320,14 +320,13 @@ def export_tflite(keras_model, im, file, int8, data, ncalib, prefix=colorstr('Te
 
         converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
         converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
-        if half:
-            output_path = str(file).replace('.pt', '-fp16.tflite')
-            converter.target_spec.supported_types = [tf.float16]
+        if keep_f32:
+            output_path = str(file).replace('.pt', '-fp32.tflite')
+            converter.target_spec.supported_types = [tf.float32]
         else:
             output_path = str(file).replace('.pt', '-fp16.tflite')
             converter.target_spec.supported_types = [tf.float16]
-        LOGGER.info(f'----------this is supported options {converter.target_spec.supported_types} ')
-        print(converter.target_spec.supported_types)
+
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
         if int8:
             from models.tf import representative_dataset_gen
@@ -437,7 +436,8 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         topk_all=100,  # TF.js NMS: topk for all classes to keep
         iou_thres=0.45,  # TF.js NMS: IoU threshold
         conf_thres=0.25,  # TF.js NMS: confidence threshold
-        name='' # Name of output-file
+        name='', # Name of output-file
+        keep_f32=False
         ):
     t = time.time()
     include = [x.lower() for x in include]  # to lowercase
@@ -515,7 +515,7 @@ def run(data=ROOT / 'data/coco128.yaml',  # 'dataset.yaml path'
         if pb or tfjs:  # pb prerequisite to tfjs
             f[6] = export_pb(model, im, file)
         if tflite or edgetpu:
-            f[7] = export_tflite(model, im, file = output_path, int8=int8 or edgetpu, data=data, ncalib=100, half=half)
+            f[7] = export_tflite(model, im, file = output_path, int8=int8 or edgetpu, data=data, ncalib=100, keep_f32=keep_f32)
         if edgetpu:
             f[8] = export_edgetpu(model, im, file)
         if tfjs:
@@ -561,6 +561,7 @@ def parse_opt():
                         help='torchscript, onnx, openvino, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs')
 
     parser.add_argument('--name', type=str, default='', help='Name of output-file')
+    parser.add_argument('--keep_f32', action='store_true', help='Keep float32 in TensorflowLite')
 
     opt = parser.parse_args()
     print_args(FILE.stem, opt)

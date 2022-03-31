@@ -109,6 +109,12 @@ python3 yolov5/export.py --weights /project/yolo_results/exp/weights/best.pt --i
 python3 export.py --weights /project/yolo_results/exp/weights/best.pt --include onnx --imgsz 768
 ````
 
+## Export multiple input-sizes
+Modify and run in docker image:
+````bash
+sh export_multiple.sh
+````
+
 # Inference 
 ## Using yolov5 repo
 ````bash
