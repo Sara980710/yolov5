@@ -22,3 +22,4 @@ thop  # FLOPs computation
 
 # Export ------------------------------------
 tensorflow-cpu==2.8
+flatbuffers==1.12

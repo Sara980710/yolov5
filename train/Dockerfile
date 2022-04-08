@@ -1,7 +1,7 @@
 FROM nvcr.io/nvidia/pytorch:21.03-py3
 
 # Install linux packages
-RUN apt update && apt install -y tmux libgl1-mesa-glx 
+RUN apt update && apt install -y zip tmux libgl1-mesa-glx 
 
 # Install python dependencies
 COPY requirements.txt .
