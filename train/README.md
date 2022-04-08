@@ -71,8 +71,9 @@ https://github.com/ultralytics/yolov5/issues/2377
 | 81  | 256  | 16 | 16  | 2 | yolov5n | solar-wind-2 |
 | 82  | 256  | 16 | 17  | 2 | no | iconic-bee-4 |
 | 81  | 256  | 16 | 1  | 2 | yolov5s | legendary-wood-5 |
-| ?  | 100  | 16 | 21  | 2 | yolov5l | jumping-shape-11 |
+| 80  | 100  | 16 | 21  | 2 | yolov5l | jumping-shape-11 |
 | 82  | 256  | 16 | 24  | 2 | no | scarlet-bee-25 |
+| 80  | 256  | 16 | 25  | 2 | yolov5n | twilight-sponge-26 |
 
 ## Validation
 * --task, 'train, val, test, speed or study'
