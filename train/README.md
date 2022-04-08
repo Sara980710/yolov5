@@ -67,7 +67,7 @@ https://github.com/ultralytics/yolov5/issues/2377
 
 ### Trained so far...
 | Epochs  | Batch size | workers | exp | GPUs | pretrained weights | wandb |
-| ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
+| ------ | --------- | ------ | ---- | ------ | --| -- |
 | 81  | 256  | 16 | 16  | 2 | yolov5n | solar-wind-2 |
 | 82  | 256  | 16 | 17  | 2 | no | iconic-bee-4 |
 | 81  | 256  | 16 | 1  | 2 | yolov5s | legendary-wood-5 |
