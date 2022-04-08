@@ -56,41 +56,11 @@ train with knowledge distillation:
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp/weights/epoch80.pt
 ````
 
-## Batch size
-https://github.com/ultralytics/yolov5/issues/2377
-
-## Results 
-### Models
-- yolov5n.pt: 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs
-- yolov5n.pt: 270 layers, 7022326 parameters, 7022326 gradients, 15.8 GFLOPs
-- yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
-
-### Trained so far...
-| Epochs  | Batch size | workers | exp | GPUs | pretrained weights | wandb |
-| ------ | --------- | ------ | ---- | ------ | --| -- |
-| 81  | 256  | 16 | 16  | 2 | yolov5n | solar-wind-2 |
-| 82  | 256  | 16 | 17  | 2 | no | iconic-bee-4 |
-| 81  | 256  | 16 | 1  | 2 | yolov5s | legendary-wood-5 |
-| 80  | 100  | 16 | 21  | 2 | yolov5l | jumping-shape-11 |
-| 82  | 256  | 16 | 24  | 2 | no | scarlet-bee-25 |
-| 80  | 256  | 16 | 25  | 2 | yolov5n | twilight-sponge-26 |
-
 ## Validation
 * --task, 'train, val, test, speed or study'
 ````bash
 python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0 --task test --save-txt
 ````
-
-### test for 28884 images and 12416 labels
-| exp | training   | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
-| --- | ---------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
-| 11  | 16/epoch80 | 1     | 1 | 0.787 | 0.653 | 0.716 | 0.447 |  0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 15  | 16/epoch80-fp16.tflite  | 1     | 1 | 0.781 | 0.654 | 0.71 | 0.439 |  15.8ms pre-process, 198.9ms inference, 48.1ms NMS per image at shape (1, 3, 768, 768) |
-| 17  | 24/epoch80 | 256 | 2 | 0.783 | 0.666 | 0.731  | 0.467 | 0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
-| 16 | 24/epoch80 | 1 | 1 | 0.796 | 0.657 | 0.731  | 0.467 | 0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-
-                  
 
 # Export model 
 Export ussing export.py
