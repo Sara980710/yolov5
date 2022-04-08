@@ -56,38 +56,11 @@ train with knowledge distillation:
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp/weights/epoch80.pt
 ````
 
-## Batch size
-https://github.com/ultralytics/yolov5/issues/2377
-
-## Results 
-### Models
-- yolov5n.pt: 270 layers, 1765270 parameters, 1765270 gradients, 4.2 GFLOPs
-- yolov5n.pt: 270 layers, 7022326 parameters, 7022326 gradients, 15.8 GFLOPs
-- yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
-
-### Trained so far...
-| Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
-| ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
-| 81  | 256  | 16 | 16 | 306 | 2 | yolov5n | solar-wind-2 |
-| 82  | 256  | 16 | 17 | 309 | 2 | no | iconic-bee-4 |
-| 81  | 256  | 16 | 1 | 348 | 2 | yolov5s | legendary-wood-5 |
-| ?  | 100  | 16 | 21 | 348 | 2 | yolov5l | jumping-shape-11 |
-
 ## Validation
 * --task, 'train, val, test, speed or study'
 ````bash
 python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0 --task test --save-txt
 ````
-
-### test for 28884 images and 12416 labels
-| exp | training   | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
-| --- | ---------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
-| 3   | 16/epoch52 | 256   | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
-| 4   | 17/best    | 256   | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
-| 1   | 16/epoch52 | 1     | 1 | 0.755 | 0.63  | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 7   | 17/last    | 1     | 1 | 0.766 | 0.622 | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 11  | 16/epoch80 | 1     | 1 | 0.787 | 0.653 | 0.716 | 0.447 |  0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 
 # Export model 
 Export ussing export.py
@@ -95,18 +68,10 @@ Export ussing export.py
 ````bash
 python yolov5/export.py --weights /home/sara/Documents/Master-thesis/yolov5/models/yolov5n.pt --include tflite --imgsz 768
 ````
-or
-````bash
-cd yolov5/
-python export.py --weights /home/sara/Desktop/Master-thesis/best.pt --include onnx --imgsz 768
-````
 
 Aiqu:
 ````bash
 python3 yolov5/export.py --weights /project/yolo_results/exp/weights/best.pt --include tflite --imgsz 768 --name somename
-````
-````bash
-python3 export.py --weights /project/yolo_results/exp/weights/best.pt --include onnx --imgsz 768
 ````
 
 ## Export multiple input-sizes
