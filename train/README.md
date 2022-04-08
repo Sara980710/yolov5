@@ -66,12 +66,13 @@ https://github.com/ultralytics/yolov5/issues/2377
 - yolov5l.pt: 468 layers, 46138294 parameters, 46138294 gradients, 107.9 GFLOPs
 
 ### Trained so far...
-| Epochs  | Batch size | workers | exp | job ID | GPUs | pretrained weights | wandb |
+| Epochs  | Batch size | workers | exp | GPUs | pretrained weights | wandb |
 | ------ | --------- | ------ | ----------- | ---- | ------ | --| -- |
-| 81  | 256  | 16 | 16 | 306 | 2 | yolov5n | solar-wind-2 |
-| 82  | 256  | 16 | 17 | 309 | 2 | no | iconic-bee-4 |
-| 81  | 256  | 16 | 1 | 348 | 2 | yolov5s | legendary-wood-5 |
-| ?  | 100  | 16 | 21 | 348 | 2 | yolov5l | jumping-shape-11 |
+| 81  | 256  | 16 | 16  | 2 | yolov5n | solar-wind-2 |
+| 82  | 256  | 16 | 17  | 2 | no | iconic-bee-4 |
+| 81  | 256  | 16 | 1  | 2 | yolov5s | legendary-wood-5 |
+| ?  | 100  | 16 | 21  | 2 | yolov5l | jumping-shape-11 |
+| 82  | 256  | 16 | 24  | 2 | no | scarlet-bee-25 |
 
 ## Validation
 * --task, 'train, val, test, speed or study'
@@ -82,13 +83,10 @@ python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_ai
 ### test for 28884 images and 12416 labels
 | exp | training   | Batch size  | GPUs | P | R | mAP@.5 | mAP@.5:.95 | Speed |
 | --- | ---------- | ----------  | ---- | - | - | ------ | ---------- | ----- |
-| 3   | 16/epoch52 | 256   | 2 | 0.767 | 0.661 | 0.711 | 0.442 |  0.1ms pre-process, 0.9ms inference, 0.6ms NMS per image at shape (256, 3, 768, 768) |
-| 4   | 17/best    | 256   | 2 | 0.755 | 0.63  | 0.683 | 0.425 |  0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
-| 1   | 16/epoch52 | 1     | 1 | 0.755 | 0.63  | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 7   | 17/last    | 1     | 1 | 0.766 | 0.622 | 0.683 | 0.425 |  0.2ms pre-process, 7.2ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 | 11  | 16/epoch80 | 1     | 1 | 0.787 | 0.653 | 0.716 | 0.447 |  0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 | 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
-| 15  | 1/epoch80-fp16.tflite  | 1     | 1 | 0.781 | 0.654 | 0.71 | 0.439 |  15.8ms pre-process, 198.9ms inference, 48.1ms NMS per image at shape (1, 3, 768, 768) |
+| 15  | 16/epoch80-fp16.tflite  | 1     | 1 | 0.781 | 0.654 | 0.71 | 0.439 |  15.8ms pre-process, 198.9ms inference, 48.1ms NMS per image at shape (1, 3, 768, 768) |
+| 17  | 24/epoch80 | 256 | 2 | 0.783 | 0.666 | 0.731  | 0.467 | 0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
 
 # Export model 
 Export ussing export.py
