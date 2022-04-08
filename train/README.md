@@ -59,7 +59,7 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 7
 ## Validation
 * --task, 'train, val, test, speed or study'
 ````bash
-python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/best.pt --project /project/yolo_results_test --device 0 --task test --save-txt
+python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_aiqu.yaml --weights /project/yolo_results/exp16/weights/epoch80.pt --project /project/yolo_results_test --device 0 --task test --save-txt
 ````
 
 # Export model 
