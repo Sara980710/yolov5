@@ -87,6 +87,9 @@ python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_ai
 | 12  | 1/epoch80  | 1     | 1 | 0.787 | 0.702 | 0.76 | 0.489 |  0.3ms pre-process, 8.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
 | 15  | 16/epoch80-fp16.tflite  | 1     | 1 | 0.781 | 0.654 | 0.71 | 0.439 |  15.8ms pre-process, 198.9ms inference, 48.1ms NMS per image at shape (1, 3, 768, 768) |
 | 17  | 24/epoch80 | 256 | 2 | 0.783 | 0.666 | 0.731  | 0.467 | 0.1ms pre-process, 0.9ms inference, 0.5ms NMS per image at shape (256, 3, 768, 768) |
+| 16 | 24/epoch80 | 1 | 1 | 0.796 | 0.657 | 0.731  | 0.467 | 0.3ms pre-process, 7.1ms inference, 0.6ms NMS per image at shape (1, 3, 768, 768) |
+
+                  
 
 # Export model 
 Export ussing export.py
