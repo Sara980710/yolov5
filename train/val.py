@@ -157,9 +157,9 @@ def run(data,
 
     if (save_info):
         with open(os.path.join(save_dir, "info.txt"),"w") as f:
-            f.writelines([f"{data =}", [f"{weights =}"], [f"{batch_size =}"], [f"{imgsz =}"], [f"{conf_thres =}"], [f"{iou_thres =}",
-                         f"{task =}", [f"{device =}"], [f"{workers =}"], [f"{single_cls =}"], [f"{augment =}"], [f"{project =}"]],
-                         f"{name =}", [f"{half =}"], [f"{dnn =}"], [f"{model =}"], [f"{dataloader =}"], [f"{save_dir =}"], [f"{compute_loss =}"]])
+            f.writelines([f"{data= }\n", f"{weights= }\n", f"{batch_size= }\n", f"{imgsz= }\n", f"{conf_thres= }\n", f"{iou_thres= }\n",
+                         f"{task= }\n", f"{device= }\n", f"{workers= }\n", f"{single_cls= }\n", f"{augment= }\n", f"{project= }\n",
+                         f"{name= }\n", f"{half= }\n", f"{dnn= }\n", f"{dataloader= }\n", f"{save_dir= }\n", f"{compute_loss= }\n"])
 
     # Configure
     model.eval()
@@ -273,7 +273,7 @@ def run(data,
 
     if (save_result):
         with open(os.path.join(save_dir, "metrics.txt"),"w") as f:
-            f.write(pf % ('all', seen, nt.sum(), mp, mr, map50, map))
+            f.writelines([('%20s' + '%11s' * 6 + "\n") % ('Class', 'Images', 'Labels', 'P', 'R', 'mAP@.5', 'mAP@.5:.95'), pf % ('all', seen, nt.sum(), mp, mr, map50, map)])
     
 
     # Print results per class
