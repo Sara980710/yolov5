@@ -22,6 +22,7 @@ WORKDIR /yolov5/
 RUN git clone -b v6.1 https://github.com/ultralytics/yolov5.git
 COPY train.py yolov5/
 COPY export.py yolov5/
+COPY val.py yolov5/
 COPY export_multiple.sh .
 
 # login to wandb
