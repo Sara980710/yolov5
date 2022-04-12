@@ -7,6 +7,7 @@ yolov5/
 datasets/
 runs/
 *.pt
+*.cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
