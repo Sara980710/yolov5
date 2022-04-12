@@ -49,7 +49,7 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 7
 ````
 run multiple (important: use bash, read command line in case of instructions):
 ````bash
-bash train_multiple.sh
+bash train_multiple.sh models/yolov5n.yaml train/weights/yolov5n.pt 256 3
 ````
 resume training (you can chane nr epochs in opt.yaml in the exp-folder):
 ````bash
