@@ -24,6 +24,7 @@ COPY train.py yolov5/
 COPY export.py yolov5/
 COPY val.py yolov5/
 COPY export_multiple.sh .
+COPY train_multiple.sh .
 
 # login to wandb
 COPY .netrc /root/
