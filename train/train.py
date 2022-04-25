@@ -143,6 +143,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
 
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
+        LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
 
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
@@ -215,7 +216,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         # Epochs
         start_epoch = ckpt['epoch'] + 1
         if resume:
-            assert start_epoch > 0, f'{weights} training to {epochs} epochs is finished, nothing to resume.'
+            assert start_epoch > 0, f'{weights} training to {epochs} epochs is finished (model state: {ckpt["epoch"]}), nothing to resume.'
         if epochs < start_epoch:
             LOGGER.info(f"{weights} has been trained for {ckpt['epoch']} epochs. Fine-tuning for {epochs} more epochs.")
             epochs += ckpt['epoch']  # finetune additional epochs
@@ -296,17 +297,6 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         for param in kd_model.parameters():
             param.requires_grad = False
 
-        # Get dimensions from dummy data
-        dummy = torch.zeros((1, 3, opt.imgsz, opt.imgsz), device=device)
-        targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(device)
-
-        _, student_features, _ = model(dummy, target=targets)
-        _, teacher_features, _ = kd_model(dummy, target=targets) 
-        
-        _, student_channel, student_out_size, _ = student_features.shape
-        _, teacher_channel, teacher_out_size, _ = teacher_features.shape
-        
-        stu_feature_adapt = nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU())
 
     # Start training
     t0 = time.time()
@@ -319,10 +309,14 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     scaler = amp.GradScaler(enabled=cuda)
     stopper = EarlyStopping(patience=opt.patience)
     compute_loss = ComputeLoss(model)  # init loss class
+    if opt.kd_weights:
+        compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device)
+
     LOGGER.info(f'Image sizes {imgsz} train, {imgsz} val\n'
                 f'Using {train_loader.num_workers * WORLD_SIZE} dataloader workers\n'
                 f"Logging results to {colorstr('bold', save_dir)}\n"
                 f'Starting training for {epochs} epochs...')
+                
     for epoch in range(start_epoch, epochs):  # epoch ------------------------------------------------------------------
         model.train()
 
@@ -339,7 +333,11 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         # b = int(random.uniform(0.25 * imgsz, 0.75 * imgsz + gs) // gs * gs)
         # dataset.mosaic_border = [b - imgsz, -b]  # height, width borders
 
-        mloss = torch.zeros(3, device=device)  # mean losses
+        if opt.kd_weights:
+            mloss = torch.zeros(4, device=device)  # mean losses
+        else:
+            mloss = torch.zeros(3, device=device)  # mean losses
+
         if RANK != -1:
             train_loader.sampler.set_epoch(epoch)
         pbar = enumerate(train_loader)
@@ -374,9 +372,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             with amp.autocast(enabled=cuda):
                 if opt.kd_weights:
                     targets = targets.to(device)
-                    student_pred, student_features, _ = model(imgs, target=targets)  # forward
-                    _, teacher_features, teacher_mask = kd_model(imgs, target=targets)  # forward
-                    loss, loss_items = compute_loss(student_pred, targets, stu_feature_adapt(student_features), teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
+                    student_pred, student_features, _ = model(imgs, kd_targets=targets)  # forward
+                    _, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets)  # forward
+                    loss, loss_items = compute_loss(student_pred, targets, student_features, teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
                     loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
