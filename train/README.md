@@ -36,12 +36,12 @@ python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolo
 
 train with knowledge distillation:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights yolov5s.pt
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt
 ````
 ### Aiqu
 One GPU:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 
+python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0 --save-period 1 
 ````
 Multiple GUP:s [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/) (nproc_per_node is number of cores).
 ````bash
@@ -61,6 +61,10 @@ python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yol
 ````
 ````bash
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp39/weights/epoch80.pt
+````
+Using [wonbeomjang](https://github.com/wonbeomjang/yolov5-knowledge-distillation)
+````bash
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --teacher_weight /project/yolo_results/exp39/weights/epoch80.pt
 ````
 
 ## Validation
