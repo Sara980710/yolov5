@@ -24,6 +24,8 @@ from utils.general import LOGGER, check_version, check_yaml, make_divisible, pri
 from utils.plots import feature_visualization
 from utils.torch_utils import fuse_conv_and_bn, initialize_weights, model_info, scale_img, select_device, time_sync
 
+from utils.kd import get_imitation_mask
+
 try:
     import thop  # for FLOPs computation
 except ImportError:
@@ -84,6 +86,9 @@ class Detect(nn.Module):
 class Model(nn.Module):
     def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):  # model, input channels, number of classes
         super().__init__()
+
+        self.kd_anchors = None
+
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
         else:  # is *.yaml
@@ -120,10 +125,18 @@ class Model(nn.Module):
         self.info()
         LOGGER.info('')
 
-    def forward(self, x, augment=False, profile=False, visualize=False, ):
+    def forward(self, x, augment=False, profile=False, visualize=False, kd_targets=None):
         if augment:
             return self._forward_augment(x)  # augmented inference, None
-        return self._forward_once(x, profile, visualize)  # single-scale inference, train
+
+        # kd
+        if kd_targets is not None:
+            # x_center, y_center, width, height
+            preds, features = self._forward_once(x, profile, visualize, kd_targets)
+            mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
+            return preds, features, mask
+
+        return self._forward_once(x, profile, visualize, kd_targets)  # single-scale inference, train
 
     def _forward_augment(self, x):
         img_size = x.shape[-2:]  # height, width
@@ -139,8 +152,10 @@ class Model(nn.Module):
         y = self._clip_augmented(y)  # clip augmented tails
         return torch.cat(y, 1), None  # augmented inference, train
 
-    def _forward_once(self, x, profile=False, visualize=False):
+    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None):
         y, dt = [], []  # outputs
+
+        concats = 0
         for m in self.model:
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
@@ -150,6 +165,14 @@ class Model(nn.Module):
             y.append(x if m.i in self.save else None)  # save output
             if visualize:
                 feature_visualization(x, m.type, m.i, save_dir=visualize)
+            
+            # kd layer
+            if isinstance(m, Concat):
+                concats += 1
+                if concats == 2:
+                    feature = x
+        if kd_targets is not None:
+            return x, feature
         return x
 
     def _descale_pred(self, p, flips, scale, img_size):
@@ -238,6 +261,8 @@ class Model(nn.Module):
             if isinstance(m.anchor_grid, list):
                 m.anchor_grid = list(map(fn, m.anchor_grid))
         return self
+
+    
 
 
 def parse_model(d, ch):  # model_dict, input_channels(3)

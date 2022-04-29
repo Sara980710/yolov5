@@ -115,6 +115,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     is_coco = isinstance(val_path, str) and val_path.endswith('coco/val2017.txt')  # COCO dataset
 
     # Model
+
     check_suffix(weights, '.pt')  # check weights
     pretrained = weights.endswith('.pt')
     if pretrained:
@@ -134,16 +135,19 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     if opt.kd_weights:
         kd_weights = opt.kd_weights
 
-        check_suffix(kd_weights, '.pt')  # check weights
-        assert kd_weights.endswith('.pt'), f"Teacher weights {kd_weights} is not pretrained"
+        #check_suffix(kd_weights, '.pt')  # check weights
+        #assert kd_weights.endswith('.pt'), f"Teacher weights {kd_weights} is not pretrained"
 
         with torch_distributed_zero_first(LOCAL_RANK):
             kd_weights = attempt_download(kd_weights)  # download if not found locally
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
-        kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
-
+        #kd_model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+        kd_model = Model(cfg or kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+        ## QUESTION ABOVE
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
         LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
+
+        
 
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
@@ -293,6 +297,11 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
         kd_model.names = names
 
+        kd_cfg = kd_ckpt['model'].yaml
+        kd_anchors = kd_cfg['anchors']
+        kd_model.kd_anchors = kd_anchors
+        model.kd_anchors = kd_anchors
+
         # Freeze all layers
         for param in kd_model.parameters():
             param.requires_grad = False
@@ -333,10 +342,12 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         # b = int(random.uniform(0.25 * imgsz, 0.75 * imgsz + gs) // gs * gs)
         # dataset.mosaic_border = [b - imgsz, -b]  # height, width borders
 
-        if opt.kd_weights:
-            mloss = torch.zeros(4, device=device)  # mean losses
-        else:
-            mloss = torch.zeros(3, device=device)  # mean losses
+        #if opt.kd_weights:
+        #    mloss = torch.zeros(4, device=device)  # mean losses
+        #else:
+        #    mloss = torch.zeros(3, device=device)  # mean losses
+        mloss = torch.zeros(3, device=device)  # mean losses
+        #QUESTION
 
         if RANK != -1:
             train_loader.sampler.set_epoch(epoch)
@@ -370,14 +381,15 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
             # Forward
             with amp.autocast(enabled=cuda):
+                targets = targets.to(device)
+
                 if opt.kd_weights:
-                    targets = targets.to(device)
                     student_pred, student_features, _ = model(imgs, kd_targets=targets)  # forward
                     _, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets)  # forward
-                    loss, loss_items = compute_loss(student_pred, targets, student_features, teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
+                    loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
-                    loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
+                    loss, loss_items = compute_loss(pred, targets)  # loss scaled by batch_size
 
                 if RANK != -1:
                     loss *= WORLD_SIZE  # gradient averaged between devices in DDP mode

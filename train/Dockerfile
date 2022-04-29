@@ -20,11 +20,18 @@ WORKDIR /yolov5/
 #RUN git clone https://github.com/wonbeomjang/yolov5-knowledge-distillation.git yolov5
 #Or
 RUN git clone -b v6.1 https://github.com/ultralytics/yolov5.git
+
 COPY train.py yolov5/
 COPY export.py yolov5/
 COPY val.py yolov5/
+COPY yolo.py yolov5/models/
+COPY kd.py yolov5/utils/
+COPY loss.py yolov5/utils/
+
 COPY export_multiple.sh .
 COPY train_multiple.sh .
+COPY validate_multiple.sh .
+COPY resume_multiple.sh .
 
 # login to wandb
 COPY .netrc /root/
