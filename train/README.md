@@ -82,7 +82,7 @@ python yolov5/export.py --weights /home/sara/Documents/Master-thesis/yolov5/mode
 
 Aiqu:
 ````bash
-python3 yolov5/export.py --weights /project/yolo_results/exp/weights/best.pt --include tflite --imgsz 768 --name somename
+python3 yolov5/export.py --weights /project/yolo_results/exp16/weights/best.pt --include tflite --imgsz 3360 --name 3360
 ````
 
 ## Export multiple input-sizes
