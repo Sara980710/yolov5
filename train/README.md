@@ -28,7 +28,7 @@ docker push user/repo:tag
 ### Test training locally
 CPU: 
 ````bash
-docker run --shm-size=1g  -it  -v /home/sara/Documents/Master-thesis/dataset/only_boats:/example_data sara980710/yolov5_kd_env:v1.0
+docker run --shm-size=1g  -it  -v /home/sara/Documents/Master-thesis/dataset/only_boats:/example_data sara980710/yolov5_env:v2.8
 ````
 ````bash
 python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1
