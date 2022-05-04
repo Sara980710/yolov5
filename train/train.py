@@ -142,7 +142,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             kd_weights = attempt_download(kd_weights)  # download if not found locally
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
         #kd_model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
-        kd_model = Model(cfg or kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+        kd_model = Model(cfg or kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors'), is_teacher=True).to(device)  # create
         ## QUESTION ABOVE
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
         LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
@@ -300,7 +300,6 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_cfg = kd_ckpt['model'].yaml
         kd_anchors = kd_cfg['anchors']
         kd_model.kd_anchors = kd_anchors
-        model.kd_anchors = kd_anchors
 
         # Freeze all layers
         for param in kd_model.parameters():

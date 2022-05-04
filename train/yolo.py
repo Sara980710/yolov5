@@ -84,10 +84,11 @@ class Detect(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):  # model, input channels, number of classes
+    def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None, is_teacher=False):  # model, input channels, number of classes
         super().__init__()
 
         self.kd_anchors = None
+        self.is_teacher = is_teacher
 
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
@@ -131,9 +132,12 @@ class Model(nn.Module):
 
         # kd
         if kd_targets is not None:
-            # x_center, y_center, width, height
+            mask = None
             preds, features = self._forward_once(x, profile, visualize, kd_targets)
-            mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
+
+            if self.is_teacher:
+                mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
+            
             return preds, features, mask
 
         return self._forward_once(x, profile, visualize, kd_targets)  # single-scale inference, train
@@ -171,6 +175,9 @@ class Model(nn.Module):
                 concats += 1
                 if concats == 2:
                     feature = x
+                    if self.is_teacher:
+                        break
+
         if kd_targets is not None:
             return x, feature
         return x

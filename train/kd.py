@@ -1,7 +1,13 @@
 import torch
 import numpy as np
 
-def make_center_anchors(anchors_wh, grid_size=80, device='cpu'):
+def make_center_anchors(anchors_in, grid_size=80, device='cpu'):
+    anchors_wh = []
+    for anchor_set in anchors_in:
+        for i in range(0,len(anchor_set),2):
+            anchors_wh.append((anchor_set[i], anchor_set[i+1]))
+        
+    len_anchors = len(anchors_wh)
 
     grid_arange = torch.arange(grid_size)
     xx, yy = torch.meshgrid(grid_arange, grid_arange)  # + 0.5  # grid center, [fmsize*fmsize,2]
@@ -9,8 +15,9 @@ def make_center_anchors(anchors_wh, grid_size=80, device='cpu'):
 
     wh = torch.tensor(anchors_wh)
 
-    xy = xy.view(grid_size, grid_size, 1, 2).expand(grid_size, grid_size, 5, 2).type(torch.float32)  # centor
-    wh = wh.view(1, 1, 5, 2).expand(grid_size, grid_size, 5, 2).type(torch.float32)  # w, h
+    xy = xy.view(grid_size, grid_size, 1, 2).expand(grid_size, grid_size, len_anchors, 2).type(torch.float32)  # center
+    wh = wh.view(1, 1, len_anchors, 2).expand(grid_size, grid_size, len_anchors, 2).type(torch.float32)  # w, h
+    wh = wh.expand(grid_size, grid_size, len_anchors, 2).type(torch.float32)  # w, h
     center_anchors = torch.cat([xy, wh], dim=3).to(device)
     # cy cx w h
 
@@ -39,7 +46,7 @@ def make_center_anchors(anchors_wh, grid_size=80, device='cpu'):
     pytorch view has reverse index
     """
 
-    return center_anchors
+    return center_anchors, len_anchors
 
 def center_to_corner(cxcy):
     x1y1 = cxcy[..., :2] - cxcy[..., 2:] / 2
@@ -93,10 +100,11 @@ def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
     """
     gt_box: (B, K, 4) [x_min, y_min, x_max, y_max]
     """
+    #print(f"Feature size: {features.shape}")
+    #print(f"Feature size 2: {features.size(2)}")
     out_size = features.size(2)
     batch_size = features.size(0)
     device = kd_targets.device
-    num_anchors = len(anchors)
 
     # create init mask
     mask_batch = torch.zeros([batch_size, out_size, out_size])
@@ -126,8 +134,9 @@ def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
     gt_boxes = torch.cat(gt_boxes, 0)
     gt_boxes *= out_size
 
-    #center_anchors = make_center_anchors(anchors_wh=anchors, grid_size=out_size, device=device)
-    anchors = center_to_corner(anchors)#.view(-1, 4)  # (N, 4)
+    center_anchors, num_anchors = make_center_anchors(anchors, grid_size=out_size, device=device)
+
+    anchors = center_to_corner(center_anchors).view(-1, 4)  # (N, 4)
 
     gt_boxes = center_to_corner(gt_boxes)
 
@@ -156,6 +165,8 @@ def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
     return mask_batch  # (B, h, w)
 
 if __name__ == "__main__":
+    #np.array([0,0,0])
 
     anchors = [(1.3221, 1.73145), (3.19275, 4.00944), (5.05587, 8.09892), (9.47112, 4.84053), (11.2364, 10.0071)]
-    make_center_anchors(anchors)
+    center = make_center_anchors(anchors)
+    anchors = center_to_corner(center)#.view(-1, 4)  # (N, 4)

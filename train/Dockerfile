@@ -12,7 +12,7 @@ RUN pip install --no-cache -r requirements.txt coremltools onnx gsutil notebook
 WORKDIR /
 
 # (workaround for skipping cache):
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache 
+# ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache 
 # Clone from github
 RUN git clone https://github.com/Sara980710/yolov5 
 WORKDIR /yolov5/ 
@@ -27,6 +27,8 @@ COPY val.py yolov5/
 COPY yolo.py yolov5/models/
 COPY kd.py yolov5/utils/
 COPY loss.py yolov5/utils/
+
+COPY weights train/
 
 COPY export_multiple.sh .
 COPY train_multiple.sh .
