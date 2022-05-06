@@ -57,10 +57,10 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 
 ````
 train with knowledge distillation:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0 --save-period 10 --cache --kd_weights /project/yolo_results/exp39/weights/epoch80.pt --kd_factor 0.01
+python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0 --save-period 10 --cache --kd_weights /project/yolo_results/exp39/weights/epoch80.pt --kd_factor 0.01 --kd_warmup 10
 ````
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp39/weights/epoch80.pt --kd_factor 0.01
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache --kd_weights /project/yolo_results/exp39/weights/epoch80.pt --kd_factor 0.01 --kd_warmup 10
 ````
 Using [wonbeomjang](https://github.com/wonbeomjang/yolov5-knowledge-distillation)
 ````bash
