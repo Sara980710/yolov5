@@ -77,12 +77,12 @@ python3 yolov5/val.py --imgsz 768 --batch-size 1 --data datadef/airbus_kaggle_ai
 Export ussing export.py
 
 ````bash
-python yolov5/export.py --weights /home/sara/Documents/Master-thesis/yolov5/models/yolov5n.pt --include tflite --imgsz 768
+python yolov5/export.py --weights /home/sara/Documents/Master-thesis/yolov5/models/yolov5n.pt --include tflite --imgsz 768 --name 768 --batch-size 2
 ````
 
 Aiqu:
 ````bash
-python3 yolov5/export.py --weights /project/yolo_results/exp16/weights/best.pt --include tflite --imgsz 3360 --name 3360
+python3 yolov5/export.py --weights /project/yolo_results/exp16/weights/best.pt --include tflite --imgsz 3360 --name 3360 --batch-size 2
 ````
 
 ## Export multiple input-sizes
