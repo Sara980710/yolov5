@@ -146,7 +146,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_cfg = kd_ckpt['model'].yaml
         kd_anchors = kd_cfg['anchors']
         kd_model.kd_anchors = []
-        use_ancors_list = opt.kd_use_anchors.strip(["[","]"]).split(",")
+        use_ancors_list = opt.kd_use_anchors.strip("[").strip("]").split(",")
         for i, use in enumerate(use_ancors_list):
             if use:
                 kd_model.kd_anchors.append(kd_anchors[i])
