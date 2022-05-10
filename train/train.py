@@ -150,6 +150,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         for i, use in enumerate(use_ancors_list):
             if use:
                 kd_model.kd_anchors.append(kd_anchors[i])
+        LOGGER.info(f'Teacher anchor used: {kd_model.kd_anchors}')  # report
 
         
 
