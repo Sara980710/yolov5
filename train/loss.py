@@ -90,10 +90,12 @@ class QFocalLoss(nn.Module):
 
 class ComputeLoss:
     # Compute losses
-    def __init__(self, model, autobalance=False):
+    def __init__(self, model, autobalance=False, kd_factor=0.01, kd_warmup=0):
         self.sort_obj_iou = False
         device = next(model.parameters()).device  # get model device
         h = model.hyp  # hyperparameters
+        self.kd_factor=kd_factor
+        self.kd_warmup=kd_warmup
 
         # Define criteria
         BCEcls = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([h['cls_pw']], device=device))
@@ -114,20 +116,20 @@ class ComputeLoss:
         for k in 'na', 'nc', 'nl', 'anchors':
             setattr(self, k, getattr(det, k))
 
-    def set_feature_adaptation_layer(self, student_model, teacher_model, img_size, device):
+    def set_feature_adaptation_layer(self, student_model, teacher_model, img_size, device, kd_feature_map):
         # Get dimensions from dummy data
         dummy = torch.zeros((1, 3, img_size, img_size), device=device)
         targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(device)
 
-        _, student_features, _ = student_model(dummy, kd_targets=targets)
-        _, teacher_features, _ = teacher_model(dummy, kd_targets=targets) 
+        _, student_features, _ = student_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map)
+        _, teacher_features, _ = teacher_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map) 
         
         _, student_channel, student_out_size, _ = student_features.shape
         _, teacher_channel, teacher_out_size, _ = teacher_features.shape
         
         self.feature_adaptation_layer =  nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU()).to(device)
 
-    def __call__(self, p, targets, student_features=None, teacher_features=None, mask=None, balance_factor=0.01):  # predictions, targets, model
+    def __call__(self, p, targets, student_features=None, teacher_features=None, mask=None):  # predictions, targets, model
         device = targets.device
         lcls, lbox, lobj = torch.zeros(1, device=device), torch.zeros(1, device=device), torch.zeros(1, device=device)
         tcls, tbox, indices, anchors = self.build_targets(p, targets)  # targets
@@ -178,12 +180,13 @@ class ComputeLoss:
         bs = tobj.shape[0]  # batch size
 
         # Knowledge distillation
-        if teacher_features is not None:
+        if teacher_features is not None and self.kd_warmup > 0:
             assert(student_features is not None and teacher_features is not None and mask is not None)
 
             diff = torch.pow(student_features - teacher_features, 2) * mask
             diff = diff.sum() / mask.sum() / 2
-            lim = diff * 0.01
+            lim = diff * self.kd_factor
+            self.kd_warmup -= 1
 
         else:
             lim = 0

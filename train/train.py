@@ -138,15 +138,18 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         with torch_distributed_zero_first(LOCAL_RANK):
             kd_weights = attempt_download(kd_weights)  # download if not found locally
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
-        #kd_model = Model(cfg, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
-        kd_model = Model(cfg or kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors'), is_teacher=True).to(device)  # create
+        kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors'), is_teacher=True).to(device)  # create
 
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
         LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
 
         kd_cfg = kd_ckpt['model'].yaml
         kd_anchors = kd_cfg['anchors']
-        kd_model.kd_anchors = kd_anchors
+        kd_model.kd_anchors = []
+        use_ancors_list = opt.kd_use_anchors.strip(["[","]"]).split(",")
+        for i, use in enumerate(use_ancors_list):
+            if use:
+                kd_model.kd_anchors.append(kd_anchors[i])
 
         
 
@@ -297,6 +300,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_model.hyp = hyp  # attach hyperparameters to model
         kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
         kd_model.names = names
+        kd_feature_map=opt.kd_feature_map
 
         # Freeze all layers
         for param in kd_model.parameters():
@@ -313,9 +317,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     scheduler.last_epoch = start_epoch - 1  # do not move
     scaler = amp.GradScaler(enabled=cuda)
     stopper = EarlyStopping(patience=opt.patience)
-    compute_loss = ComputeLoss(model)  # init loss class
+    compute_loss = ComputeLoss(model, kd_factor=(opt.kd_factor), kd_warmup=(opt.kd_warmup))  # init loss class
     if opt.kd_weights:
-        compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device)
+        compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device, kd_feature_map)
 
     LOGGER.info(f'Image sizes {imgsz} train, {imgsz} val\n'
                 f'Using {train_loader.num_workers * WORLD_SIZE} dataloader workers\n'
@@ -374,8 +378,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             with amp.autocast(enabled=cuda):
                 if opt.kd_weights:
                     targets = targets.to(device)
-                    student_pred, student_features, _ = model(imgs, kd_targets=targets)  # forward
-                    _, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets)  # forward
+                    student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
+                    _, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
                     loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
@@ -544,6 +548,10 @@ def parse_opt(known=False):
     parser.add_argument('--artifact_alias', type=str, default='latest', help='W&B: Version of dataset artifact to use')
 
     parser.add_argument('--kd_weights', type=str, default='', help='initial weights path to teacher in knowledge distillation')
+    parser.add_argument('--kd_factor', type=float, default=0.01, help='factor for the teacher-loss')
+    parser.add_argument('--kd_warmup', type=int, default=0, help='number of warmup epochs for knowledge distillation')
+    parser.add_argument('--kd_feature_map', type=int, default=2, help='Which feature map in the FPN to use for knowledge distillation')
+    parser.add_argument('--kd_use_anchors', type=str, default='[1,1,1]', help='which anchors to use for feature imitation knowledge distillation. "[1,0,1]" where 1 is true 0 is false and "[P3/8, P4/16, P5/32]"')
     
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
