@@ -125,7 +125,7 @@ def run(data,
         val_before_train=False
         ):
     # Initialize/load model and set device
-    training = (model is not None) and not val_before_train
+    training = (model is not None)
     if training:  # called by train.py
         device, pt, jit, engine = next(model.parameters()).device, True, False, False  # get model device, PyTorch model
 
@@ -170,7 +170,7 @@ def run(data,
     niou = iouv.numel()
 
     # Dataloader
-    if not training:
+    if not training or val_before_train:
         model.warmup(imgsz=(1 if pt else batch_size, 3, imgsz, imgsz), half=half)  # warmup
         pad = 0.0 if task in ('speed', 'benchmark') else 0.5
         rect = False if task == 'benchmark' else pt  # square inference for benchmarks

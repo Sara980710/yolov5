@@ -77,6 +77,7 @@ def val_at_start(model, opt, data_dict):
                         # callbacks=callbacks,
                         # compute_loss=compute_loss,  # val best model with plots
                         val_before_train=True,
+                        task='test'
                     )
     return results
 
