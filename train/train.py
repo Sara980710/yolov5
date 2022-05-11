@@ -61,6 +61,23 @@ LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable
 RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 
+def val_at_start(model, opt, data_dict):
+    LOGGER.info(f'\nValidating {f}...')
+    results, _, _ = val.run(data_dict,
+                        batch_size=1,
+                        imgsz=opt.imgsz,
+                        model=model, # attempt_load(model_path, device).half(),
+                        iou_thres=0.60,  # best pycocotools results at 0.65
+                        single_cls=opt.single_cls,
+                        # dataloader=val_loader,
+                        save_dir=opt.save_dir,
+                        save_json=False,
+                        verbose=True,
+                        plots=True,
+                        # callbacks=callbacks,
+                        # compute_loss=compute_loss,  # val best model with plots
+                    )
+    return results
 
 def train(hyp,  # path/to/hyp.yaml or hyp dictionary
           opt,
@@ -135,13 +152,18 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     if opt.kd_weights:
         kd_weights = opt.kd_weights
 
-        with torch_distributed_zero_first(LOCAL_RANK):
-            kd_weights = attempt_download(kd_weights)  # download if not found locally
+        #with torch_distributed_zero_first(LOCAL_RANK):
+        #    kd_weights = attempt_download(kd_weights)  # download if not found locally
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
-        kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors'), is_teacher=True).to(device)  # create
-
+        kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
+        
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
         LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
+
+        if opt.kd_val_start:
+            val_at_start(model, opt, data_dict)
+
+        kd_model.is_teacher = True
 
         kd_cfg = kd_ckpt['model'].yaml
         kd_anchors = kd_cfg['anchors']
@@ -553,7 +575,8 @@ def parse_opt(known=False):
     parser.add_argument('--kd_warmup', type=int, default=0, help='number of warmup epochs for knowledge distillation')
     parser.add_argument('--kd_feature_map', type=int, default=2, help='Which feature map in the FPN to use for knowledge distillation')
     parser.add_argument('--kd_use_anchors', type=str, default='[1,1,1]', help='which anchors to use for feature imitation knowledge distillation. "[1,0,1]" where 1 is true 0 is false and "[P3/8, P4/16, P5/32]"')
-    
+    parser.add_argument('--kd_val_start', action='store_true', help='Set to validate the teacher model on the test dataset before the start of the training')
+
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
