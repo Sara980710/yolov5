@@ -121,10 +121,11 @@ def run(data,
         callbacks=Callbacks(),
         compute_loss=None,
         save_info=False,
-        save_result=False
+        save_result=False,
+        val_before_train=False
         ):
     # Initialize/load model and set device
-    training = model is not None
+    training = (model is not None) and not val_before_train
     if training:  # called by train.py
         device, pt, jit, engine = next(model.parameters()).device, True, False, False  # get model device, PyTorch model
 

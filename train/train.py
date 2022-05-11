@@ -62,7 +62,7 @@ RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 
 def val_at_start(model, opt, data_dict):
-    LOGGER.info(f'\nValidating {f}...')
+    LOGGER.info(f'\nValidating teacher model...')
     results, _, _ = val.run(data_dict,
                         batch_size=1,
                         imgsz=opt.imgsz,
@@ -76,6 +76,7 @@ def val_at_start(model, opt, data_dict):
                         plots=True,
                         # callbacks=callbacks,
                         # compute_loss=compute_loss,  # val best model with plots
+                        val_before_train=True,
                     )
     return results
 
