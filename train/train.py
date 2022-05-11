@@ -162,9 +162,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
         print("\nfloat")
         print(kd_ckpt['model'].float())
-        print("\nstate")
-        print(kd_ckpt['model'].float().state_dict())
         kd_csd = kd_ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
+        csd = intersect_dicts(csd, model.state_dict())  # intersect
         kd_model.load_state_dict(kd_csd, strict=False)  # load
 
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
