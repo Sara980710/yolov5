@@ -157,10 +157,21 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         #with torch_distributed_zero_first(LOCAL_RANK):
         #    kd_weights = attempt_download(kd_weights)  # download if not found locally
         kd_ckpt = torch.load(kd_weights, map_location='cpu')  # load checkpoint to CPU to avoid CUDA memory leak
+        print("\nyaml")
+        print(kd_ckpt['model'].yaml)
         kd_model = Model(kd_ckpt['model'].yaml, ch=3, nc=nc, anchors=hyp.get('anchors')).to(device)  # create
-        
+        print("\nfloat")
+        print(kd_ckpt['model'].float())
+        print("\nstate")
+        print(kd_ckpt['model'].float().state_dict())
+        kd_csd = kd_ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
+        kd_model.load_state_dict(kd_csd, strict=False)  # load
+
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
-        LOGGER.info(f'Teacher info: \n--trained epochs: {kd_ckpt["epoch"]}')  # report
+        LOGGER.info(f'Teacher trained epochs: {kd_ckpt["epoch"]}')  # report
+        LOGGER.info(f'Transferred {len(kd_csd)}/{len(kd_model.state_dict())} items from {kd_weights}')  # report
+        
+        
 
         if opt.kd_val_start:
             val_at_start(model, opt, data_dict)
