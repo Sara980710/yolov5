@@ -90,12 +90,13 @@ class QFocalLoss(nn.Module):
 
 class ComputeLoss:
     # Compute losses
-    def __init__(self, model, autobalance=False, kd_factor=0.01, kd_warmup=0):
+    def __init__(self, model, autobalance=False, kd_factor=0.01, kd_warmup=0, kd_hard_labels=False):
         self.sort_obj_iou = False
         device = next(model.parameters()).device  # get model device
         h = model.hyp  # hyperparameters
         self.kd_factor=kd_factor
         self.kd_warmup=kd_warmup
+        self.kd_hard_labels=kd_hard_labels
 
         # Define criteria
         BCEcls = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([h['cls_pw']], device=device))
@@ -129,7 +130,7 @@ class ComputeLoss:
         
         self.feature_adaptation_layer =  nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU()).to(device)
 
-    def __call__(self, p, targets, student_features=None, teacher_features=None, mask=None):  # predictions, targets, model
+    def __call__(self, p, targets, student_features=None, teacher_features=None, mask=None, teacher_pred=None, temperature=None):  # predictions, targets, model
         device = targets.device
         lcls, lbox, lobj = torch.zeros(1, device=device), torch.zeros(1, device=device), torch.zeros(1, device=device)
         tcls, tbox, indices, anchors = self.build_targets(p, targets)  # targets
@@ -180,16 +181,28 @@ class ComputeLoss:
         bs = tobj.shape[0]  # batch size
 
         # Knowledge distillation
-        if teacher_features is not None and self.kd_warmup > 0:
-            assert(student_features is not None and teacher_features is not None and mask is not None)
+        if (teacher_features is not None or self.kd_hard_labels) and self.kd_warmup <= 0:
+            if self.kd_hard_labels:
+                assert(teacher_pred is not None)
+                #t_soft = teacher_pred, temperature
+                diff = torch.pow(teacher_pred - p, 2)
+                diff = diff.sum() / diff.numel()
+                lim = diff * self.kd_factor
+            else:
+                assert(student_features is not None and teacher_features is not None and mask is not None)
 
-            diff = torch.pow(student_features - teacher_features, 2) * mask
-            diff = diff.sum() / mask.sum() / 2
-            lim = diff * self.kd_factor
-            self.kd_warmup -= 1
+                diff = torch.pow(student_features - teacher_features, 2) * mask
+                diff = diff.sum() / mask.sum() / 2
+                lim = diff * self.kd_factor
 
         else:
+            self.kd_warmup -= 1
             lim = 0
+        
+        """ print(f"{lim= }")
+        print(f"{lbox= }")
+        print(f"{lobj= }")
+        print(f"{lcls= }") """
 
         return (lbox + lobj + lcls + lim) * bs, torch.cat((lbox, lobj, lcls)).detach()
 

@@ -89,6 +89,7 @@ class Model(nn.Module):
 
         self.kd_anchors = None
         self.is_teacher = is_teacher
+        self.kd_hard_labels = None
 
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
@@ -135,7 +136,7 @@ class Model(nn.Module):
             mask = None
             preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_map)
 
-            if self.is_teacher:
+            if self.is_teacher and not self.kd_hard_labels:
                 mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
             
             return preds, features, mask
@@ -175,8 +176,6 @@ class Model(nn.Module):
                 concats += 1
                 if concats == kd_feature_map:
                     feature = x
-                    if kd_targets is not None and self.is_teacher:
-                        break
 
         if kd_targets is not None:
             return x, feature
