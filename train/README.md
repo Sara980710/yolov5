@@ -35,9 +35,11 @@ python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolo
 ````
 
 train with knowledge distillation:
+Feature imitation
 ````bash
 python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01 --kd_warmup 400 --kd_feature_map 2 --kd_use_anchors [1,1,1]
 ````
+Hard labels
 ````bash
 python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01  --
 ````
