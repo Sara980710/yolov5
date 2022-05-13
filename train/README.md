@@ -36,7 +36,10 @@ python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolo
 
 train with knowledge distillation:
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01 --kd_warmup 400 --kd_feature_map 2
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01 --kd_warmup 400 --kd_feature_map 2 --kd_use_anchors [1,1,1]
+````
+````bash
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01  --
 ````
 ### Aiqu
 One GPU:
@@ -45,7 +48,7 @@ python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 64 --cfg models/yol
 ````
 Multiple GUP:s [From documentation](https://docs.ultralytics.com/tutorials/multi-gpu-training/) (nproc_per_node is number of cores).
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --cache
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10
 ````
 run multiple (important: use bash, read command line in case of instructions):
 ````bash
@@ -53,7 +56,7 @@ bash train_multiple.sh models/yolov5n.yaml train/weights/yolov5n.pt 256 3
 ````
 resume training (you can chane nr epochs in opt.yaml in the exp-folder):
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 0,1 --save-period 10 --cache --resume /project/yolo_results/exp16/weights/best.pt
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --device 0,1 --save-period 10 --resume /project/yolo_results/exp16/weights/best.pt
 ````
 train with knowledge distillation:
 ````bash
