@@ -61,22 +61,21 @@ LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable
 RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 
-def val_at_start(model, opt, data_dict):
+def val_at_start(model, opt, data_dict, dataloader):
     LOGGER.info(f'\nValidating teacher model...')
     results, _, _ = val.run(data_dict,
                         batch_size=1,
                         imgsz=opt.imgsz,
                         model=model, # attempt_load(model_path, device).half(),
-                        iou_thres=0.60,  # best pycocotools results at 0.65
+                        #iou_thres=0.60,  # best pycocotools results at 0.65
                         single_cls=opt.single_cls,
-                        # dataloader=val_loader,
-                        save_dir=opt.save_dir,
+                        dataloader=dataloader,
+                        #save_dir=opt.save_dir,
                         save_json=False,
                         verbose=True,
                         plots=True,
                         # callbacks=callbacks,
                         # compute_loss=compute_loss,  # val best model with plots
-                        val_before_train=True,
                         task='test'
                     )
     return results
@@ -127,14 +126,13 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     init_seeds(1 + RANK)
     with torch_distributed_zero_first(LOCAL_RANK):
         data_dict = data_dict or check_dataset(data)  # check if None
-    train_path, val_path = data_dict['train'], data_dict['val']
+    train_path, val_path, test_path = data_dict['train'], data_dict['val'], data_dict['test']
     nc = 1 if single_cls else int(data_dict['nc'])  # number of classes
     names = ['item'] if single_cls and len(data_dict['names']) != 1 else data_dict['names']  # class names
     assert len(names) == nc, f'{len(names)} names found for nc={nc} dataset in {data}'  # check
     is_coco = isinstance(val_path, str) and val_path.endswith('coco/val2017.txt')  # COCO dataset
 
     # Model
-
     check_suffix(weights, '.pt')  # check weights
     pretrained = weights.endswith('.pt')
     if pretrained:
@@ -166,22 +164,6 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         LOGGER.info(f'Teacher model for KD is loaded from {kd_weights}')  # report
         LOGGER.info(f'Teacher trained epochs: {kd_ckpt["epoch"]}')  # report
         LOGGER.info(f'Transferred {len(kd_csd)}/{len(kd_model.state_dict())} items from {kd_weights}')  # report
-
-        if opt.kd_val_start:
-            val_at_start(model, opt, data_dict)
-
-        kd_model.is_teacher = True
-
-        kd_cfg = kd_ckpt['model'].yaml
-        kd_anchors = kd_cfg['anchors']
-        kd_model.kd_anchors = []
-        use_ancors_list = opt.kd_use_anchors.strip("[").strip("]").split(",")
-        for i, use in enumerate(use_ancors_list):
-            if use:
-                kd_model.kd_anchors.append(kd_anchors[i])
-        LOGGER.info(f'--anchor used: {kd_model.kd_anchors}')  # report
-
-        
 
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
@@ -292,6 +274,9 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                                        hyp=hyp, cache=None if noval else opt.cache,
                                        rect=True, rank=-1, workers=workers * 2, pad=0.5,
                                        prefix=colorstr('val: '))[0]
+        if opt.kd_val_start:
+            test_loader = create_dataloader(test_path, imgsz, batch_size, gs, single_cls, pad=0.5, rect=True,
+                                       workers=workers, prefix=colorstr(f'test: '))[0]
 
         if not resume:
             labels = np.concatenate(dataset.labels, 0)
@@ -326,6 +311,21 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     model.names = names
 
     if opt.kd_weights:
+        if opt.kd_val_start:
+            val_at_start(kd_model, opt, data_dict, test_loader)
+
+        kd_model.is_teacher = True
+
+        kd_cfg = kd_ckpt['model'].yaml
+        kd_anchors = kd_cfg['anchors']
+        kd_model.kd_anchors = []
+        use_ancors_list = opt.kd_use_anchors.strip("[").strip("]").split(",")
+        for i, use in enumerate(use_ancors_list):
+            if use:
+                kd_model.kd_anchors.append(kd_anchors[i])
+        LOGGER.info(f'--anchor used: {kd_model.kd_anchors}')  # report
+
+
         kd_model.nc = nc  # attach number of classes to model
         kd_model.hyp = hyp  # attach hyperparameters to model
         kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
