@@ -139,6 +139,10 @@ class Model(nn.Module):
             if self.is_teacher and not self.kd_hard_labels:
                 mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
             
+            print(preds)
+            print(features)
+            print(mask)
+            
             return preds, features, mask
 
         return self._forward_once(x, profile, visualize, kd_targets)  # single-scale inference, train
