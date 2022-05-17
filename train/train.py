@@ -165,6 +165,17 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         LOGGER.info(f'Teacher trained epochs: {kd_ckpt["epoch"]}')  # report
         LOGGER.info(f'Transferred {len(kd_csd)}/{len(kd_model.state_dict())} items from {kd_weights}')  # report
 
+        kd_model.is_teacher = True
+
+        kd_cfg = kd_ckpt['model'].yaml
+        kd_anchors = kd_cfg['anchors']
+        kd_model.kd_anchors = []
+        use_ancors_list = opt.kd_use_anchors.strip("[").strip("]").split(",")
+        for i, use in enumerate(use_ancors_list):
+            if use:
+                kd_model.kd_anchors.append(kd_anchors[i])
+        LOGGER.info(f'--anchor used: {kd_model.kd_anchors}')  # report
+
     # Freeze
     freeze = [f'model.{x}.' for x in (freeze if len(freeze) > 1 else range(freeze[0]))]  # layers to freeze
     for k, v in model.named_parameters():
@@ -312,26 +323,16 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
     if opt.kd_weights:
         if opt.kd_val_start:
+            kd_model.is_teacher = False
             val_at_start(kd_model, opt, data_dict, test_loader)
-
-        kd_model.is_teacher = True
-        kd_model.kd_hard_labels = opt.kd_hard_labels
-
-        kd_cfg = kd_ckpt['model'].yaml
-        kd_anchors = kd_cfg['anchors']
-        kd_model.kd_anchors = []
-        use_ancors_list = opt.kd_use_anchors.strip("[").strip("]").split(",")
-        for i, use in enumerate(use_ancors_list):
-            if use:
-                kd_model.kd_anchors.append(kd_anchors[i])
-        LOGGER.info(f'--anchor used: {kd_model.kd_anchors}')  # report
-
+            kd_model.is_teacher = True
 
         kd_model.nc = nc  # attach number of classes to model
         kd_model.hyp = hyp  # attach hyperparameters to model
         kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
         kd_model.names = names
         kd_feature_map=opt.kd_feature_map
+        kd_no_imitation = opt.kd_no_imitation
 
         # Freeze all layers
         for param in kd_model.parameters():
@@ -348,7 +349,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     scheduler.last_epoch = start_epoch - 1  # do not move
     scaler = amp.GradScaler(enabled=cuda)
     stopper = EarlyStopping(patience=opt.patience)
-    compute_loss = ComputeLoss(model, kd_factor=(opt.kd_factor), kd_warmup=(opt.kd_warmup), kd_hard_labels = opt.kd_hard_labels)  # init loss class
+    compute_loss = ComputeLoss(model, kd_factor=(opt.kd_factor), kd_warmup=(opt.kd_warmup))  # init loss class
     if opt.kd_weights and not opt.kd_hard_labels:
         compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device, kd_feature_map)
 
@@ -409,12 +410,16 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
             with amp.autocast(enabled=cuda):
                 if opt.kd_weights:
                     targets = targets.to(device)
-                    student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
-                    teacher_pred, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
+                    
                     if opt.kd_hard_labels:
-                        loss, loss_items = compute_loss(student_pred, targets, teacher_pred, opt.kd_temperature)  # loss scaled by batch_size
+                        student_pred = model(imgs)  # forward
+                        teacher_pred = kd_model(imgs)[1]  # forward
+                        
+                        loss, loss_items = compute_loss(student_pred, targets, teacher_pred=teacher_pred, temperature=opt.kd_temperature)  # loss scaled by batch_size
                     else:
-                        loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach())  # loss scaled by batch_size
+                        student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
+                        teacher_pred, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
+                        loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach(), kd_no_imitation=kd_no_imitation)  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
                     loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
@@ -589,6 +594,7 @@ def parse_opt(known=False):
     parser.add_argument('--kd_val_start', action='store_true', help='Set to validate the teacher model on the test dataset before the start of the training')
     parser.add_argument('--kd_hard_labels', action='store_true', help='Use hard_labels as loss for knowledge distillation')
     parser.add_argument('--kd_temperature', type=float, default=1, help='Temperature used for knowledge distillation')
+    parser.add_argument('--kd_no_imitation', action='store_true', help='Turn off imitation mask')
 
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt

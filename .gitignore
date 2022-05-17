@@ -8,6 +8,7 @@ datasets/
 runs/
 *.pt
 *.cache
+yolov5-knowledge-distillation/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -89,7 +89,6 @@ class Model(nn.Module):
 
         self.kd_anchors = None
         self.is_teacher = is_teacher
-        self.kd_hard_labels = None
 
         if isinstance(cfg, dict):
             self.yaml = cfg  # model dict
@@ -136,16 +135,12 @@ class Model(nn.Module):
             mask = None
             preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_map)
 
-            if self.is_teacher and not self.kd_hard_labels:
+            if self.is_teacher:
                 mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
-            
-            print(preds)
-            print(features)
-            print(mask)
             
             return preds, features, mask
 
-        return self._forward_once(x, profile, visualize, kd_targets)  # single-scale inference, train
+        return self._forward_once(x, profile, visualize)  # single-scale inference, train
 
     def _forward_augment(self, x):
         img_size = x.shape[-2:]  # height, width
@@ -182,7 +177,9 @@ class Model(nn.Module):
                     feature = x
 
         if kd_targets is not None:
+
             return x, feature
+
         return x
 
     def _descale_pred(self, p, flips, scale, img_size):

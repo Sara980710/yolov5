@@ -59,8 +59,20 @@ def corner_to_center(xy):
     wh = xy[..., 2:] - xy[..., :2]
     return torch.cat([cxcy, wh], dim=-1)
 
+def find_intersection(set_1, set_2):
+    lower_bounds = torch.max(set_1[:, :2].unsqueeze(1), set_2[:, :2].unsqueeze(0))  # (n1, n2, 2)
+    upper_bounds = torch.min(set_1[:, 2:].unsqueeze(1), set_2[:, 2:].unsqueeze(0))  # (n1, n2, 2)
+    intersection_dims = torch.clamp(upper_bounds - lower_bounds, min=0)  # (n1, n2, 2)  
+    return  intersection_dims[:, :, 0] * intersection_dims[:, :, 1]  # (n1, n2) 
 
-def find_jaccard_overlap(set_1, set_2, eps=1e-5):
+def find_union(set_1, set_2, intersection):
+    areas_set_1 = (set_1[:, 2] - set_1[:, 0]) * (set_1[:, 3] - set_1[:, 1])  # (n1)
+    areas_set_2 = (set_2[:, 2] - set_2[:, 0]) * (set_2[:, 3] - set_2[:, 1])  # (n2)
+    return areas_set_1.unsqueeze(1) + areas_set_2.unsqueeze(0) - intersection + 1e-10  # (n1, n2)
+
+
+
+def find_jaccard_overlap(set_1, set_2):
     """
     Find the Jaccard Overlap (IoU) of every box combination between two sets of boxes that are in boundary coordinates.
     :param set_1: set 1, a tensor of dimensions (n1, 4)
@@ -69,32 +81,16 @@ def find_jaccard_overlap(set_1, set_2, eps=1e-5):
     """
 
     # Find intersections
-    intersection = find_intersection(set_1, set_2)  # (n1, n2)
-
-    # Find areas of each box in both sets
-    areas_set_1 = (set_1[:, 2] - set_1[:, 0]) * (set_1[:, 3] - set_1[:, 1])  # (n1)
-    areas_set_2 = (set_2[:, 2] - set_2[:, 0]) * (set_2[:, 3] - set_2[:, 1])  # (n2)
-
+    intersection = find_intersection(set_1, set_2)
+    
     # Find the union
-    # PyTorch auto-broadcasts singleton dimensions
-    union = areas_set_1.unsqueeze(1) + areas_set_2.unsqueeze(0) - intersection + eps  # (n1, n2)
+    union = find_union(set_1, set_2, intersection)
 
     return intersection / union  # (n1, n2)
 
 
-def find_intersection(set_1, set_2):
-    """
-    Find the intersection of every box combination between two sets of boxes that are in boundary coordinates.
-    :param set_1: set 1, a tensor of dimensions (n1, 4)
-    :param set_2: set 2, a tensor of dimensions (n2, 4)
-    :return: intersection of each of the boxes in set 1 with respect to each of the boxes in set 2, a tensor of dimensions (n1, n2)
-    """
 
-    # PyTorch auto-broadcasts singleton dimensions
-    lower_bounds = torch.max(set_1[:, :2].unsqueeze(1), set_2[:, :2].unsqueeze(0))  # (n1, n2, 2)
-    upper_bounds = torch.min(set_1[:, 2:].unsqueeze(1), set_2[:, 2:].unsqueeze(0))  # (n1, n2, 2)
-    intersection_dims = torch.clamp(upper_bounds - lower_bounds, min=0)  # (n1, n2, 2)  # 0 혹은 양수로 만드는 부분
-    return intersection_dims[:, :, 0] * intersection_dims[:, :, 1]  # (n1, n2)  # 둘다 양수인 부분만 존재하게됨!
+    
 
 def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
     """
@@ -147,7 +143,7 @@ def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
         if not num_obj:
             continue
 
-        IOU_map = find_jaccard_overlap(anchors, gt_boxes[i], 0).view(out_size, out_size, num_anchors, num_obj)
+        IOU_map = find_jaccard_overlap(anchors, gt_boxes[i]).view(out_size, out_size, num_anchors, num_obj)
         max_iou, _ = IOU_map.view(-1, num_obj).max(dim=0)
         mask_img = torch.zeros([out_size, out_size], dtype=torch.int64, requires_grad=False).type_as(features)
         threshold = max_iou * iou_factor
@@ -167,6 +163,25 @@ def get_imitation_mask(features, kd_targets, anchors, iou_factor=0.5):
 if __name__ == "__main__":
     #np.array([0,0,0])
 
-    anchors = [(1.3221, 1.73145), (3.19275, 4.00944), (5.05587, 8.09892), (9.47112, 4.84053), (11.2364, 10.0071)]
-    center = make_center_anchors(anchors)
+    """ anchors = [(1.3221, 1.73145), (3.19275, 4.00944), (5.05587, 8.09892), (9.47112, 4.84053), (11.2364, 10.0071)]
+    center, numa = make_center_anchors(anchors, grid_size=1)
+    print(center)
     anchors = center_to_corner(center)#.view(-1, 4)  # (N, 4)
+    print(anchors)
+    print(0.5-1.3221/2)
+    print(0.5+1.3221/2) """
+
+    """ anchors = torch.tensor([[0, 0, 1, 1], [1,1,1.25,1.25]])
+    gt_boxex = torch.tensor([[0, 0, 1, 1], [0.5, 0.5, 1, 1], [1, 1, 1.5, 1.5]])
+    print(anchors.shape)
+    print(gt_boxex.shape)
+    print(find_intersection(anchors, gt_boxex)) """
+
+    #anchors = torch.tensor([[0, 0, 1, 1], [1,1,1.5,1.5]])
+    #areas_set_1 = (anchors[:, 2] - anchors[:, 0]) * (anchors[:, 3] - anchors[:, 1])  # (n1)
+    #print(areas_set_1)
+
+    #anchors = torch.tensor([[0, 0, 1, 1], [1,1,2,2]])
+    #gt_boxex = torch.tensor([[0, 0, 1, 1], [0.5, 0.5, 1, 1], [1, 1, 2, 2]])
+    #intersection = find_intersection(anchors, gt_boxex)
+    #print(find_union(anchors, gt_boxex, intersection))
