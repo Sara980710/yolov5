@@ -123,11 +123,14 @@ class ComputeLoss:
 
         _, student_features, _ = student_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map)
         _, teacher_features, _ = teacher_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map) 
+
+        self.feature_adaptation_layers = []
         
-        _, student_channel, student_out_size, _ = student_features.shape
-        _, teacher_channel, teacher_out_size, _ = teacher_features.shape
-        
-        self.feature_adaptation_layer =  nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU()).to(device)
+        for sf, tf in zip(student_features, teacher_features):
+            _, student_channel, student_out_size, _ = student_features.shape
+            _, teacher_channel, teacher_out_size, _ = teacher_features.shape
+            
+            self.feature_adaptation_layers.append(nn.Sequential(nn.Conv2d(student_channel, teacher_channel, 3, padding=1, stride=int(student_out_size / teacher_out_size)), nn.ReLU()).to(device))
 
     def __call__(self, p, targets, student_features=None, teacher_features=None, mask=None, teacher_pred=None, temperature=None, kd_no_imitation=False):  # predictions, targets, model
         device = targets.device

@@ -422,7 +422,10 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                     else:
                         student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_maps=kd_feature_maps)  # forward
                         teacher_pred, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_maps=kd_feature_maps)  # forward
-                        loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach(), kd_no_imitation=kd_no_imitation)  # loss scaled by batch_size
+                        adapted_student = []
+                        for adap_layer, sf in zip(compute_loss.feature_adaptation_layer, student_features):
+                            adapted_student.append(adap_layer(sf))
+                        loss, loss_items = compute_loss(student_pred, targets, adapted_student, teacher_features.detach(), teacher_mask.detach(), kd_no_imitation=kd_no_imitation)  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
                     loss, loss_items = compute_loss(pred, targets.to(device))  # loss scaled by batch_size
