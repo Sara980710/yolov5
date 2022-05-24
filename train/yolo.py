@@ -158,7 +158,7 @@ class Model(nn.Module):
         y = self._clip_augmented(y)  # clip augmented tails
         return torch.cat(y, 1), None  # augmented inference, train
 
-    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]]):
+    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]):
         y, dt = [], []  # outputs
 
         concats = 0
