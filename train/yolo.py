@@ -179,7 +179,6 @@ class Model(nn.Module):
                 if concats in kd_feature_map:
                     features.append(x)
         
-        print(concats)
         if kd_targets is not None:
 
             return x, features
