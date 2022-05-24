@@ -136,9 +136,9 @@ class Model(nn.Module):
             preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_map)
 
             if self.is_teacher:
-                for i in kd_feature_map:
+                for i,f in zip(kd_feature_map, features):
                     if i:
-                        masks.append(get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1))
+                        masks.append(get_imitation_mask(f, kd_targets, self.kd_anchors).unsqueeze(1))
             
             return preds, features, masks
 
