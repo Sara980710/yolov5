@@ -126,19 +126,21 @@ class Model(nn.Module):
         self.info()
         LOGGER.info('')
 
-    def forward(self, x, augment=False, profile=False, visualize=False, kd_targets=None, kd_feature_map=None):
+    def forward(self, x, augment=False, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]):
         if augment:
             return self._forward_augment(x)  # augmented inference, None
 
         # kd
         if kd_targets is not None:
-            mask = None
+            masks = []
             preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_map)
 
             if self.is_teacher:
-                mask = get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1)
+                for i in kd_feature_map:
+                    if i:
+                        masks.append(get_imitation_mask(features, kd_targets, self.kd_anchors).unsqueeze(1))
             
-            return preds, features, mask
+            return preds, features, masks
 
         return self._forward_once(x, profile, visualize)  # single-scale inference, train
 
@@ -156,10 +158,11 @@ class Model(nn.Module):
         y = self._clip_augmented(y)  # clip augmented tails
         return torch.cat(y, 1), None  # augmented inference, train
 
-    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_map=None):
+    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]]):
         y, dt = [], []  # outputs
 
         concats = 0
+        features = []
         for m in self.model:
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
@@ -173,12 +176,13 @@ class Model(nn.Module):
             # kd layer
             if isinstance(m, Concat):
                 concats += 1
-                if concats == kd_feature_map:
-                    feature = x
-
+                if concats in kd_feature_map:
+                    features.append(x)
+        
+        print(concats)
         if kd_targets is not None:
 
-            return x, feature
+            return x, features
 
         return x
 

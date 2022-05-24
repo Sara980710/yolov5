@@ -183,14 +183,17 @@ class ComputeLoss:
         if (teacher_features is not None) and self.kd_warmup <= 0:
             # KD with imitation mask
             assert(student_features is not None and teacher_features is not None and mask is not None)
+            lim = 0
             if (kd_no_imitation):
-                diff = torch.pow(student_features - teacher_features, 2)
-                diff = diff.sum() / mask.sum() / 2
-                lim = diff * self.kd_factor
+                for sf, tf, m in zip(student_features, teacher_features, mask):
+                    diff = torch.pow(sf - tf, 2)
+                    diff = diff.sum() / m.sum() / 2
+                    lim += diff * self.kd_factor
             else:
-                diff = torch.pow(student_features - teacher_features, 2) * mask
-                diff = diff.sum() / mask.sum() / 2
-                lim = diff * self.kd_factor
+                for sf, tf, m in zip(student_features, teacher_features, mask):
+                    diff = torch.pow(sf - tf, 2) * mask
+                    diff = diff.sum() / m.sum() / 2
+                    lim += diff * self.kd_factor
         elif (teacher_pred is not None) and self.kd_warmup <= 0:
             # KD with hard labels
             assert(teacher_pred is not None)

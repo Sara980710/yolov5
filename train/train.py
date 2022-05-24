@@ -331,8 +331,11 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         kd_model.hyp = hyp  # attach hyperparameters to model
         kd_model.class_weights = labels_to_class_weights(dataset.labels, nc).to(device) * nc  # attach class weights
         kd_model.names = names
-        kd_feature_map=opt.kd_feature_map
+
         kd_no_imitation = opt.kd_no_imitation
+
+        kd_feature_maps = opt.kd_feature_maps.strip("[").strip("]").split(",")
+        assert(len(kd_feature_maps) == 4) # 4 concatinations
 
         # Freeze all layers
         for param in kd_model.parameters():
@@ -351,7 +354,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
     stopper = EarlyStopping(patience=opt.patience)
     compute_loss = ComputeLoss(model, kd_factor=(opt.kd_factor), kd_warmup=(opt.kd_warmup))  # init loss class
     if opt.kd_weights and not opt.kd_hard_labels:
-        compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device, kd_feature_map)
+        compute_loss.set_feature_adaptation_layer(model, kd_model, opt.imgsz, device, kd_feature_maps)
 
     LOGGER.info(f'Image sizes {imgsz} train, {imgsz} val\n'
                 f'Using {train_loader.num_workers * WORLD_SIZE} dataloader workers\n'
@@ -417,8 +420,8 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
                         
                         loss, loss_items = compute_loss(student_pred, targets, teacher_pred=teacher_pred, temperature=opt.kd_temperature)  # loss scaled by batch_size
                     else:
-                        student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
-                        teacher_pred, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_map=kd_feature_map)  # forward
+                        student_pred, student_features, _ = model(imgs, kd_targets=targets, kd_feature_maps=kd_feature_maps)  # forward
+                        teacher_pred, teacher_features, teacher_mask = kd_model(imgs, kd_targets=targets, kd_feature_maps=kd_feature_maps)  # forward
                         loss, loss_items = compute_loss(student_pred, targets, compute_loss.feature_adaptation_layer(student_features), teacher_features.detach(), teacher_mask.detach(), kd_no_imitation=kd_no_imitation)  # loss scaled by batch_size
                 else:
                     pred = model(imgs)  # forward
@@ -589,7 +592,7 @@ def parse_opt(known=False):
     parser.add_argument('--kd_weights', type=str, default='', help='initial weights path to teacher in knowledge distillation')
     parser.add_argument('--kd_factor', type=float, default=0.01, help='factor for the teacher-loss')
     parser.add_argument('--kd_warmup', type=int, default=0, help='number of warmup epochs for knowledge distillation')
-    parser.add_argument('--kd_feature_map', type=int, default=2, help='Which feature map in the FPN to use for knowledge distillation')
+    parser.add_argument('--kd_feature_maps', type=str, default='[0,1,0,0]', help='Which feature maps in the FPN to use for knowledge distillation')
     parser.add_argument('--kd_use_anchors', type=str, default='[1,1,1]', help='which anchors to use for feature imitation knowledge distillation. "[1,0,1]" where 1 is true 0 is false and "[P3/8, P4/16, P5/32]"')
     parser.add_argument('--kd_val_start', action='store_true', help='Set to validate the teacher model on the test dataset before the start of the training')
     parser.add_argument('--kd_hard_labels', action='store_true', help='Use hard_labels as loss for knowledge distillation')
