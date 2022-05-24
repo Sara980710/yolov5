@@ -126,19 +126,19 @@ class Model(nn.Module):
         self.info()
         LOGGER.info('')
 
-    def forward(self, x, augment=False, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]):
+    def forward(self, x, augment=False, profile=False, visualize=False, kd_targets=None, kd_feature_maps=[]):
         if augment:
             return self._forward_augment(x)  # augmented inference, None
 
         # kd
         if kd_targets is not None:
             masks = []
-            preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_map)
+            preds, features = self._forward_once(x, profile, visualize, kd_targets, kd_feature_maps)
 
             if self.is_teacher:
-                for i,f in zip(kd_feature_map, features):
+                for i,f in zip(kd_feature_maps, features):
                     if i:
-                        masks.append(get_imitation_mask(f, kd_targets, self.kd_anchors).unsqueeze(1))
+                        masks.append(get_imitation_mask(f, kd_targets, self.kd_anchors).unsqueeze(1).detach())
             
             return preds, features, masks
 
@@ -158,7 +158,7 @@ class Model(nn.Module):
         y = self._clip_augmented(y)  # clip augmented tails
         return torch.cat(y, 1), None  # augmented inference, train
 
-    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_map=[]):
+    def _forward_once(self, x, profile=False, visualize=False, kd_targets=None, kd_feature_maps=[]):
         y, dt = [], []  # outputs
 
         concats = 0
@@ -176,8 +176,8 @@ class Model(nn.Module):
             # kd layer
             if isinstance(m, Concat):
                 concats += 1
-                if concats in kd_feature_map:
-                    features.append(x)
+                if concats in kd_feature_maps:
+                    features.append(x.detach())
         
         if kd_targets is not None:
 

@@ -116,13 +116,13 @@ class ComputeLoss:
         for k in 'na', 'nc', 'nl', 'anchors':
             setattr(self, k, getattr(det, k))
 
-    def set_feature_adaptation_layer(self, student_model, teacher_model, img_size, device, kd_feature_map):
+    def set_feature_adaptation_layer(self, student_model, teacher_model, img_size, device, kd_feature_maps):
         # Get dimensions from dummy data
         dummy = torch.zeros((1, 3, img_size, img_size), device=device)
         targets = torch.Tensor([[0, 0, 0, 0, 0, 0]]).to(device)
 
-        _, student_features, _ = student_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map)
-        _, teacher_features, _ = teacher_model(dummy, kd_targets=targets, kd_feature_map=kd_feature_map) 
+        _, student_features, _ = student_model(dummy, kd_targets=targets, kd_feature_maps=kd_feature_maps)
+        _, teacher_features, _ = teacher_model(dummy, kd_targets=targets, kd_feature_maps=kd_feature_maps) 
 
         self.feature_adaptation_layers = []
         
