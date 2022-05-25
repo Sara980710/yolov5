@@ -85,7 +85,7 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 7
 Knowledge distillation: Feature imitation (coco)- Two cores
 ````bash
 cd yolov5/
-python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 81 --batch-size 256 --cfg /yolov5/models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10  --kd_weights /yolov5/train/weights/yolov5l.pt --kd_factor 0.01 --kd_warmup 400 --kd_feature_map 2 --kd_use_anchors [1,1,1]
+python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 81 --batch-size 256 --cfg /yolov5/models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10  --kd_weights /yolov5/train/weights/yolov5l.pt --kd_factor 0.01 --kd_warmup 400 --kd_feature_map [0,1,0,0] --kd_use_anchors [1,1,1]
 ````
 Knowledge distillation: Soft labels - Two cores
 ````bash
