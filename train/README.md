@@ -58,7 +58,7 @@ python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 7
 COCO multi-GPU
 ````bash
 cd yolov5/
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --epochs 300 --batch-size 256 --cfg models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10
+python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 300 --batch-size 256 --cfg /yolov5/models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10
 ````
 
 run multiple (important: use bash, read command line in case of instructions):
