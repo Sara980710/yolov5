@@ -55,6 +55,12 @@ Multiple GUP:s [From documentation](https://docs.ultralytics.com/tutorials/multi
 ````bash
 python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10
 ````
+COCO multi-GPU
+````bash
+cd yolov5/
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --epochs 300 --batch-size 256 --cfg models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10
+````
+
 run multiple (important: use bash, read command line in case of instructions):
 ````bash
 bash train_multiple.sh models/yolov5n.yaml train/weights/yolov5n.pt 256 3
