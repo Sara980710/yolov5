@@ -40,7 +40,7 @@ python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolo
 ````
 Knowledge distillation: Hard labels
 ````bash
-python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01  --kd_hard_labels --kd_temperature 1
+python3 yolov5/train.py --imgsz 768 --epochs 3 --batch-size 16 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device cpu --workers 1 --kd_weights train/weights/yolov5s.pt --kd_factor 0.01  --kd_hard_labels 
 ````
 Knowledge distillation: Feature imitation (COCO dataset)
 ````bash
@@ -88,7 +88,7 @@ python3 train.py --epochs 81 --batch-size 160 --cfg /yolov5/models/yolov5n.yaml 
 ````
 Knowledge distillation: Soft labels - One core 
 ````bash
- python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 160 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights '' --project /project/yolo_results --device 0 --save-period 10 --kd_weights /project/yolo_results/exp40/weights/epoch80.pt --kd_factor 0.01  --kd_hard_labels --kd_temperature 1
+ python3 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 160 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights '' --project /project/yolo_results --device 0 --save-period 10 --kd_weights /project/yolo_results/exp40/weights/epoch80.pt --kd_factor 0.01  --kd_hard_labels
  ````
  
 Knowledge distillation: Feature imitation - Two cores
@@ -102,12 +102,12 @@ python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 81 --ba
 ````
 Knowledge distillation: Soft labels - Two cores
 ````bash
-python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --kd_weights /project/yolo_results/exp40/weights/epoch80.pt --kd_factor 0.01  --kd_hard_labels --kd_temperature 1 --kd_warmup 400
+python3 -m torch.distributed.launch --nproc_per_node 2 yolov5/train.py --imgsz 768 --epochs 81 --batch-size 256 --cfg models/yolov5n.yaml --data datadef/airbus_kaggle_aiqu.yaml --weights train/weights/yolov5n.pt --project /project/yolo_results --device 0,1 --save-period 10 --kd_weights /project/yolo_results/exp40/weights/epoch80.pt --kd_factor 0.01  --kd_hard_labels --kd_warmup 400
 ````
 Knowledge distillation: Soft labels (coco)- Two cores
 ````bash
 cd yolov5/
-python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 81 --batch-size 256 --cfg /yolov5/models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10 --kd_weights /yolov5/train/weights/yolov5l.pt --kd_factor 0.01  --kd_hard_labels --kd_temperature 1 --kd_warmup 400
+python3 -m torch.distributed.launch --nproc_per_node 2 train.py --epochs 81 --batch-size 256 --cfg /yolov5/models/yolov5n.yaml --data coco.yaml --weights '' --project /project/yolo_results --device 0,1 --save-period 10 --kd_weights /yolov5/train/weights/yolov5l.pt --kd_factor 0.01  --kd_hard_labels 1 --kd_warmup 400
 ````
 
 Knowledge distillation: [wonbeomjang](https://github.com/wonbeomjang/yolov5-knowledge-distillation) - Two cores
